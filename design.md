@@ -1,23 +1,23 @@
-IR|ADD|SUB|AND|INC|LD|ST|JC|JZ|JMP|*XOR|*DEC|*STP|
---|---|---|---|---|--|--|--|--|---|---|---|---|
-LIR|W1|W1|W1|W1|W1|W1|W1|W1|W1|W1|W1|W1|
-PCINC|W1|W1|W1|W1|W1|W1|W1|W1|W1|W1|W1|W1|
-S[3]|W2| |W2| |W2|W2+W3| | |W2| |W2|
-S[2]| |W2| | | |W2| | |W2|W2|W2|
-S[1]|
-S[0]|
-CIN|
-ABUS|
-DRW|
-LDZ|
-LDC|
-M|
-LAR|
-LONG|
-C|
-PCADD|
-Z|
-LPC|
-STOP|
-MBUS|
-MEMU|
+IR    | ADD | SUB | AND | INC | LD | ST    | JC | JZ | JMP | *XOR | *DEC | *STP
+------|-----|-----|-----|-----|----|-------|----|----|-----|------|------|-----
+LIR   | W1  | W1  | W1  | W1  | W1 | W1    | W1 | W1 | W1  | W1   | W1   | W1
+PCINC | W1  | W1  | W1  | W1  | W1 | W1    | W1 | W1 | W1  | W1   | W1   | W1
+S[3]  | W2  |     | W2  |     | W2 | W2+W3 |    |    | W2  |      | W2   |
+S[2]  |     | W2  |     |     |    | W2    |    |    | W2  | W2   | W2   |
+S[1]  |     | W2  | W2  |     | W2 | W2+W3 |    |    | W2  | W2   | W2   |
+S[0]  | W2  |     | W2  |     |    | W2    |    |    | W2  |      | W2   |
+CIN   | W2  |     |     |     |    |       |    |    |     |      | W2   |
+ABUS  | W2  | W2  | W2  | W2  | W2 | W2+W3 |    |    | W2  | W2   | W2   |
+DRW   | W2  | W2  | W2  | W2  | W3 |       |    |    |     | W2   | W2   |
+LDZ   | W2  | W2  | W2  | W2  |    |       |    |    |     | W2   | W2   |
+LDC   | W2  | W2  |     | W2  |    |       |    |    |     |      | W2   |
+M     |     |     | W2  |     | W2 | W2+W3 |    |    | W2  | W2   |      |
+LAR   |     |     |     |     | W2 | W2    |    |    |     |      |      |
+LONG  |     |     |     |     | W2 | W2    |    |    |     |      |      |
+C     |     |     |     |     |    |       | W2 |    |     |      |      |
+PCADD |     |     |     |     |    |       | W2 | W2 |     |      |      |
+Z     |     |     |     |     |    |       |    | W2 |     |      |      |
+LPC   |     |     |     |     |    |       |    |    | W2  |      |      |
+STOP  |     |     |     |     |    |       |    |    |     |      |      | W2
+MBUS  |     |     |     |     | W3 |       |    |    |     |      |      |
+MEMW  |     |     |     |     |    | W3    |    |    |     |      |      |
