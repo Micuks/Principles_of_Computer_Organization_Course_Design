@@ -1,3 +1,7 @@
+//tb.v
+
+`timescale 1 ns / 10 ps
+
 module cpu_tb;
 
   reg [3:0] sw;
@@ -38,6 +42,8 @@ module cpu_tb;
       sel2,
       sel3;
 
+  localparam period = 20;
+
   cpu cpu_inst (
       .clr(clr),
       .t3(t3),
@@ -77,7 +83,22 @@ module cpu_tb;
   initial begin
     sw = 3'b000;
     ir = 4'b0001;
+    #period;
 
+    ir = 4'b0010;
+    #period;
+
+    ir = 4'b0011;
+    #period;
+
+    ir = 4'b0100;
+    #period;
+
+    ir = 4'b0101;
+    #period;
+
+    ir = 4'b0110;
+    #period;
   end
 
 endmodule
