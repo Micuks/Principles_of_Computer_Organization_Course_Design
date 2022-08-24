@@ -2,7 +2,7 @@ function bool_func;
   input [7:4] ir;
   input [7:4] sign;
   integer i;
-  reg result = 0;
+  reg result = 1;
   begin
     for (i = 7; i > 3; i = i - 1) begin
       result = result && (sign[i]) ? ir[i] : !ir[i];

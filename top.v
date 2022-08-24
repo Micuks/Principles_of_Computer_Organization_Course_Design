@@ -53,34 +53,33 @@ module cpu (
       if (sst0 == 1) begin
         st0 <= 1;
       end
+    end else if (!t3) begin
+      s      <= 4'b0000;
+      m      <= 1'b0;
+      cin    <= 1'b0;
+      sel3   <= 1'b0;
+      sel2   <= 1'b0;
+      sel1   <= 1'b0;
+      sel0   <= 1'b0;
+      selctl <= 1'b0;
+      lir    <= 1'b0;
+      ldc    <= 1'b0;
+      ldz    <= 1'b0;
+      lpc    <= 1'b0;
+      lar    <= 1'b0;
+      pcinc  <= 1'b0;
+      pcadd  <= 1'b0;
+      arinc  <= 1'b0;
+      long   <= 1'b0;
+      short  <= 1'b0;
+      abus   <= 1'b0;
+      mbus   <= 1'b0;
+      sbus   <= 1'b0;
+      drw    <= 1'b0;
+      memw   <= 1'b0;
+      stop   <= 1'b0;
+      sst0   <= 1'b0;
     end
-
-    s      <= 4'b0000;
-    m      <= 1'b0;
-    cin    <= 1'b0;
-    sel3   <= 1'b0;
-    sel2   <= 1'b0;
-    sel1   <= 1'b0;
-    sel0   <= 1'b0;
-    selctl <= 1'b0;
-    lir    <= 1'b0;
-    ldc    <= 1'b0;
-    ldz    <= 1'b0;
-    lpc    <= 1'b0;
-    lar    <= 1'b0;
-    pcinc  <= 1'b0;
-    pcadd  <= 1'b0;
-    arinc  <= 1'b0;
-    long   <= 1'b0;
-    short  <= 1'b0;
-    abus   <= 1'b0;
-    mbus   <= 1'b0;
-    sbus   <= 1'b0;
-    drw    <= 1'b0;
-    memw   <= 1'b0;
-    stop   <= 1'b0;
-    //	 sst0   <= 1'b0;
-
 
     case (sw)
       3'b100: begin
