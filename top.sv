@@ -109,17 +109,17 @@ module cpu (
         sst0 <= ~st0 & w1;
       end
       3'b000: begin
-        $display("sw[%3b]", sw);
-        if (st0 == 0) begin
-          sbus  <= w1;
-          lpc   <= w1;
-          short <= w1;
-          sst0  <= w1;
-          stop  <= w1;
-        end else if (st0 == 1) begin
-          pick_ir_st0_1(ir, lir, pcinc, s, cin, abus, drw, ldz, ldc, m, lar, long, c, pcadd, z, lpc,
-                        stop, mbus, memw, w1, w2, w3, short);
-        end
+        $display("st0[%1b]", st0);
+        // if (st0 == 0) begin
+        //   sbus  <= w1;
+        //   lpc   <= w1;
+        //   short <= w1;
+        //   sst0  <= w1;
+        //   stop  <= w1;
+        // end else if (st0 == 1) begin
+        pick_ir_st0_1(ir, lir, pcinc, s, cin, abus, drw, ldz, ldc, m, lar, long, c, pcadd, z, lpc,
+                      stop, mbus, memw, w1, w2, w3, short);
+        // end
       end
       default: begin
       end

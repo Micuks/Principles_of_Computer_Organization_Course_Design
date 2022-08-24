@@ -20,9 +20,10 @@ endfunction
 task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin, abus, drw, ldz,
                    ldc, m, lar, long, input c, output pcadd, input z, output lpc, stop, mbus, memw,
                    input w1, w2, w3, output short);
-  lir <= w1;
+  lir   <= w1;
   pcinc <= w1;
   short <= 0;
+  $display("lir[%b] pcinc[%b] short[%b]", lir, pcinc, short);
 
   s[3] <= ((w2 && (bool_func(  //0001,0010,0101,0110(w3),1001,1011
       ir, 0001
@@ -39,6 +40,8 @@ task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin
   ))) || w3 && bool_func(
       ir, 0110
   ));
+  $display("w2 = %1b, s[3]=%1b", w2, s[3]);
+  $display("bool_func(ir, 0001)=%1d", bool_func(ir, 0001));
 
   s[2] <= (w2 && (bool_func(
       ir, 0010

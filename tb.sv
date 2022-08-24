@@ -1,10 +1,8 @@
 //tb.v
-
-`timescale 1 ns / 10 ps
+`timescale 1 ns / 1 ps
 
 module cpu_tb;
   `include "top.sv"
-  reg [3:0] sw;
   reg [7:4] ir;
   reg [3:0] s;
   reg
@@ -50,6 +48,7 @@ module cpu_tb;
       .swa(swa),
       .swb(swb),
       .swc(swc),
+      .ir(ir),
       .w1(w1),
       .w2(w2),
       .w3(w3),
@@ -68,6 +67,7 @@ module cpu_tb;
       .ldz(ldz),
       .ldc(ldc),
       .cin(cin),
+      .s(s),
       .m(m),
       .abus(abus),
       .sbus(sbus),
@@ -79,14 +79,6 @@ module cpu_tb;
       .sel2(sel2),
       .sel3(sel3)
   );
-  // initialize
-  initial begin
-    clr = 1;
-    t3  = 0;
-    w1  = 0;
-    w2  = 0;
-    w3  = 0;
-  end
 
   // define clock
   always begin
@@ -118,24 +110,43 @@ module cpu_tb;
 
   // begin simulate
   initial begin
-    sw = 3'b000;
-    ir = 4'b0001;
+    clr = 0;
+    t3  = 0;
+    w1  = 0;
+    w2  = 0;
+    w3  = 0;
+
+    #20 clr = 1;
+
+    $display("begin simulation");
+    swa = 0;
+    swb = 0;
+    swc = 0;
+    ir  = 4'b0001;
+    $display("ir[%4b]", ir);
     #period;
 
     ir = 4'b0010;
+    $display("ir[%4b]", ir);
     #period;
 
     ir = 4'b0011;
+    $display("ir[%4b]", ir);
     #period;
 
     ir = 4'b0100;
+    $display("ir[%4b]", ir);
     #period;
 
     ir = 4'b0101;
+    $display("ir[%4b]", ir);
     #period;
 
     ir = 4'b0110;
+    $display("ir[%4b]", ir);
     #period;
+
+    $finish;
   end
 
 endmodule
