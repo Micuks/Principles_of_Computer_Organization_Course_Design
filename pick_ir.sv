@@ -1,3 +1,5 @@
+// pick_ir.sv
+
 function bool_func;
 
   input [7:4] ir;
