@@ -42,7 +42,7 @@ module cpu_tb;
       sel2,
       sel3;
 
-  localparam period = 20;
+  localparam period = 200;
 
   cpu cpu_inst (
       .clr(clr),
@@ -79,7 +79,44 @@ module cpu_tb;
       .sel2(sel2),
       .sel3(sel3)
   );
+  // initialize
+  initial begin
+    clr = 1;
+    t3  = 0;
+    w1  = 0;
+    w2  = 0;
+    w3  = 0;
+  end
 
+  // define clock
+  always begin
+    // t3, w1 rise
+    #10 t3 = !t3;
+    w1 = !w1;
+    // t3, w1 fall
+    #10 t3 = !t3;
+    w1 = !w1;
+
+    if (!short) begin
+      // t3, w2 rise
+      #10 t3 = !t3;
+      w2 = !w2;
+      // t3, w2 fall
+      #10 t3 = !t3;
+      w2 = !w2;
+
+      if (long) begin
+        // t3, w3 rise
+        t3 = !t3;
+        w3 = !w3;
+        // t3, w3 fall
+        t3 = !t3;
+        w3 = !w3;
+      end
+    end
+  end
+
+  // begin simulate
   initial begin
     sw = 3'b000;
     ir = 4'b0001;
