@@ -3,7 +3,7 @@
 `timescale 1 ns / 10 ps
 
 module cpu_tb;
-
+  `include "top.sv"
   reg [3:0] sw;
   reg [7:4] ir;
   reg [3:0] s;
