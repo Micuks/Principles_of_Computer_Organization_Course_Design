@@ -8,8 +8,8 @@ module cpu (
     input w1,
     input w2,
     input w3,
-    output reg c,
-    output reg z,
+    input c,
+    input z,
     output reg drw,
     output reg pcinc,
     output reg lpc,
@@ -43,41 +43,44 @@ module cpu (
 
   assign sw = {swc, swb, swa};
 
-  always @(negedge t3) begin
+  always @(t3, clr, w1, w2, w3) begin
     if (!clr) begin
       st0 <= 0;
-    end else if (st0 == 1 && w2 == 1 && sw == 3'b100) begin
-      st0 <= 0;
-    end
-    if (sst0 == 1) begin
-      st0 <= 1;
+    end else if (t3) begin
+      if (st0 == 1 && w2 == 1 && sw == 3'b100) begin
+        st0 <= 0;
+      end
+      if (sst0 == 1) begin
+        st0 <= 1;
+      end
     end
 
-    // s      <= 4'b0000;
-    // m      <= 1'b0;
-    // cin    <= 1'b0;
-    // sel3   <= 1'b0;
-    // sel2   <= 1'b0;
-    // sel1   <= 1'b0;
-    // sel0   <= 1'b0;
-    // selctl <= 1'b0;
-    // lir    <= 1'b0;
-    // ldc    <= 1'b0;
-    // ldz    <= 1'b0;
-    // lpc    <= 1'b0;
-    // lar    <= 1'b0;
-    // pcinc  <= 1'b0;
-    // pcadd  <= 1'b0;
-    // arinc  <= 1'b0;
-    // long   <= 1'b0;
-    // short  <= 1'b0;
-    // abus   <= 1'b0;
-    // mbus   <= 1'b0;
-    // sbus   <= 1'b0;
-    // drw    <= 1'b0;
-    // memw   <= 1'b0;
-    // stop   <= 1'b0;
-    // sst0   <= 1'b0;
+    s      <= 4'b0000;
+    m      <= 1'b0;
+    cin    <= 1'b0;
+    sel3   <= 1'b0;
+    sel2   <= 1'b0;
+    sel1   <= 1'b0;
+    sel0   <= 1'b0;
+    selctl <= 1'b0;
+    lir    <= 1'b0;
+    ldc    <= 1'b0;
+    ldz    <= 1'b0;
+    lpc    <= 1'b0;
+    lar    <= 1'b0;
+    pcinc  <= 1'b0;
+    pcadd  <= 1'b0;
+    arinc  <= 1'b0;
+    long   <= 1'b0;
+    short  <= 1'b0;
+    abus   <= 1'b0;
+    mbus   <= 1'b0;
+    sbus   <= 1'b0;
+    drw    <= 1'b0;
+    memw   <= 1'b0;
+    stop   <= 1'b0;
+    //	 sst0   <= 1'b0;
+
 
     case (sw)
       3'b100: begin
@@ -87,10 +90,24 @@ module cpu (
         $display("sw[%3b]", sw);
       end
       3'b010: begin
-        $display("sw[%3b]", sw);
+        sbus <= ~st0 & w1;
+        lar <= ~st0 & w1;
+        stop <= w1;
+        short <= w1;
+        selctl <= w1;
+        mbus <= st0 & w1;
+        arinc <= st0 & w1;
+        sst0 <= ~st0 & w1;
       end
       3'b001: begin
-        $display("sw[%3b]", sw);
+        sbus <= w1;
+        lar <= ~st0 & w1;
+        stop <= w1;
+        short <= w1;
+        selctl <= w1;
+        memw <= st0;
+        arinc <= st0 & w1;
+        sst0 <= ~st0 & w1;
       end
       3'b000: begin
         $display("sw[%3b]", sw);
@@ -99,9 +116,10 @@ module cpu (
           lpc   <= w1;
           short <= w1;
           sst0  <= w1;
+          stop  <= w1;
         end else if (st0 == 1) begin
           pick_ir_st0_1(ir, lir, pcinc, s, cin, abus, drw, ldz, ldc, m, lar, long, c, pcadd, z, lpc,
-                        stop, mbus, memw, w1, w2, w3);
+                        stop, mbus, memw, w1, w2, w3, short);
         end
       end
       default: begin

@@ -12,10 +12,12 @@ function bool_func;
   end
 endfunction
 
-task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin, abus, drw, ldz, ldc,
-                   m, lar, long, c, pcadd, z, lpc, stop, mbus, memw, input w1, w2, w3);
+task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin, abus, drw, ldz,
+                   ldc, m, lar, long, input c, output pcadd, input z, output lpc, stop, mbus, memw,
+                   input w1, w2, w3, output short);
   lir <= w1;
   pcinc <= w1;
+  short <= 0;
   s[3] <= ((w2 && (
     (!ir[7] && !ir[6] && ir[4]) || //0001,0010,0101,0110(w3),1001,1011
     (!ir[7] && ir[6] && !ir[5] && ir[4]) ||
@@ -149,11 +151,7 @@ task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin
 
   long <= (w2 && (bool_func(ir, 0101) || bool_func(ir, 0110)));
 
-  c <= w2 && bool_func(ir, 0111);
-
-  pcadd <= w2 && (bool_func(ir, 0111) || bool_func(ir, 1000));
-
-  z <= w2 && bool_func(ir, 1000);
+  pcadd <= w2 && (c || z) && (bool_func(ir, 0111) || bool_func(ir, 1000));
 
   lpc <= w2 && bool_func(ir, 1001);
 
