@@ -14,6 +14,7 @@ function bool_func;
     // end
     // bool_func = result;
     bool_func = (ir == sign);
+    $display("ir[%4b] == sign[%4b] ? %1b", ir, sign, bool_func);
   end
 endfunction
 
@@ -40,8 +41,6 @@ task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin
   ))) || w3 && bool_func(
       ir, 0110
   ));
-  $display("w2 = %1b, s[3]=%1b", w2, s[3]);
-  $display("bool_func(ir, 0001)=%1d", bool_func(ir, 0001));
 
   s[2] <= (w2 && (bool_func(
       ir, 0010

@@ -43,7 +43,7 @@ module cpu (
 
   assign sw = {swc, swb, swa};
 
-  always @(posedge t3, negedge t3, negedge clr, posedge w1) begin
+  always @(t3, clr, w1, w2, w3) begin
     if (!clr) begin
       st0 <= 0;
     end else if (t3) begin
@@ -109,7 +109,7 @@ module cpu (
         sst0 <= ~st0 & w1;
       end
       3'b000: begin
-        $display("st0[%1b]", st0);
+        // $display("st0[%1b]", st0);
         // if (st0 == 0) begin
         //   sbus  <= w1;
         //   lpc   <= w1;

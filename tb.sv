@@ -111,7 +111,6 @@ module cpu_tb;
     end else begin
       #60;
     end
-    #60;
   end
 
   // begin simulate
