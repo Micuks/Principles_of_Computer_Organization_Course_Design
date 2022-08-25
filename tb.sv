@@ -136,6 +136,7 @@ module cpu_tb;
     ir = 8'b00100000;
     $display("ir[%8b]", ir);
     #period;
+    $finish;
 
     ir = 8'b00110000;
     $display("ir[%8b]", ir);
