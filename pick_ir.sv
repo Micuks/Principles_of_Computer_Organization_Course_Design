@@ -13,8 +13,8 @@ function bool_func;
     //   $display("sign[%0d] = %0b", i, sign[i]);
     // end
     // bool_func = result;
-    bool_func = (ir == sign);
-    if (sign == 4'b0010) begin
+    bool_func = (ir[7:4] == sign[7:4]) ? 1 : 0;
+    if (bool_func) begin
       $display("ir[%4b] == sign[%4b] ? %1b", ir, sign, bool_func);
     end
   end
@@ -23,158 +23,176 @@ endfunction
 task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin, abus, drw, ldz,
                    ldc, m, lar, long, input c, output pcadd, input z, output lpc, stop, mbus, memw,
                    input w1, w2, w3, output short);
+
+  // instruction name and ir
+  localparam add = 4'b0001;
+  localparam sub = 4'b0010;
+  localparam aand = 4'b0011;
+  localparam inc = 4'b0100;
+  localparam ld = 4'b0101;
+  localparam st = 4'b0110;
+  localparam jc = 4'b0111;
+  localparam jz = 4'b1000;
+  localparam jmp = 4'b1001;
+  localparam axor = 4'b1010;
+  localparam dec = 4'b1011;
+  localparam stp = 4'b1110;
+
   lir   <= w1;
   pcinc <= w1;
   short <= 0;
+
   $display("lir[%b] pcinc[%b] short[%b]", lir, pcinc, short);
 
-  s[3] <= ((w2 && (bool_func(  //0001,0010,0101,0110(w3),1001,1011
-      ir, 0001
+  s[3] <= ((w2 && (bool_func(  //add,aand,ld,st(w3),jmp,dec
+      ir, add
   ) || bool_func(
-      ir, 0010
+      ir, aand
   ) || bool_func(
-      ir, 0101
+      ir, ld
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1011
+      ir, dec
   ))) || w3 && bool_func(
-      ir, 0110
+      ir, st
   ));
 
   s[2] <= (w2 && (bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ) || bool_func(
-      ir, 1011
+      ir, dec
   )));
 
   s[1] <= ((w2 && (bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0011
+      ir, aand
   ) || bool_func(
-      ir, 0101
+      ir, ld
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ) || bool_func(
-      ir, 1011
+      ir, dec
   )) || (w3 && (bool_func(
-      ir, 0110
+      ir, st
   )))));
 
   s[0] <= (w2 && (bool_func(
-      ir, 0001
+      ir, add
   ) || bool_func(
-      ir, 0011
+      ir, aand
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1011
+      ir, dec
   )));
 
-  cin <= (w2 && (bool_func(ir, 0001) || bool_func(ir, 1011)));
+  cin <= (w2 && (bool_func(ir, add) || bool_func(ir, dec)));
 
   abus <= ((w2 && (bool_func(
-      ir, 0001
+      ir, add
   ) || bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0011
+      ir, aand
   ) || bool_func(
-      ir, 0100
+      ir, inc
   ) || bool_func(
-      ir, 0101
+      ir, ld
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ) || bool_func(
-      ir, 1011
+      ir, dec
   ))) || (w3 && (bool_func(
-      ir, 0110
+      ir, st
   ))));
 
   drw <= ((w2 && (bool_func(
-      ir, 0001
+      ir, add
   ) || bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0011
+      ir, aand
   ) || bool_func(
-      ir, 0100
+      ir, inc
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ) || bool_func(
-      ir, 1011
+      ir, dec
   ))) || (w3 && (bool_func(
-      ir, 0101
+      ir, ld
   ))));
 
   ldz <= (w2 && (bool_func(
-      ir, 0001
+      ir, add
   ) || bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0011
+      ir, aand
   ) || bool_func(
-      ir, 0100
+      ir, inc
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ) || bool_func(
-      ir, 1011
+      ir, dec
   )));
 
   ldc <= (w2 && (bool_func(
-      ir, 0001
+      ir, add
   ) || bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0100
+      ir, inc
   ) || bool_func(
-      ir, 1011
+      ir, dec
   )));
+  $display("w2[%1b] ldc[%1b] ir[%4b] b_f(sub)[%1b]", w2, ldc, ir, bool_func(ir, sub));
 
   m <= ((w2 && (bool_func(
-      ir, 0011
+      ir, aand
   ) || bool_func(
-      ir, 0101
+      ir, ld
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ))) || (w3 && (bool_func(
-      ir, 0110
+      ir, st
   ))));
+  $display("w2[%1b] m[%1b] ir[%4b] b_f(sub)[%1b]", w2, m, ir, bool_func(ir, sub));
 
-  lar <= (w2 && (bool_func(ir, 0101) || bool_func(ir, 0110)));
+  lar   <= (w2 && (bool_func(ir, ld) || bool_func(ir, st)));
 
-  long <= (w2 && (bool_func(ir, 0101) || bool_func(ir, 0110)));
+  long  <= (w2 && (bool_func(ir, ld) || bool_func(ir, st)));
 
-  pcadd <= w2 && (c || z) && (bool_func(ir, 0111) || bool_func(ir, 1000));
+  pcadd <= w2 && (c || z) && (bool_func(ir, jc) || bool_func(ir, jz));
 
-  lpc <= w2 && bool_func(ir, 1001);
+  lpc   <= w2 && bool_func(ir, jmp);
 
-  stop <= w2 && bool_func(ir, 1110);
+  stop  <= w2 && bool_func(ir, stp);
 
-  mbus <= w3 && bool_func(ir, 0101);
+  mbus  <= w3 && bool_func(ir, ld);
 
-  memw <= w3 && bool_func(ir, 0110);
+  memw  <= w3 && bool_func(ir, st);
 endtask
