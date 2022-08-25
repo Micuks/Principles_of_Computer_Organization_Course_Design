@@ -43,7 +43,7 @@ module cpu (
 
   assign sw = {swc, swb, swa};
 
-  always @(t3, clr, w1, w2, w3) begin
+  always @(posedge t3, negedge t3, negedge clr, posedge w1) begin
     if (!clr) begin
       st0 <= 0;
     end else if (t3) begin
