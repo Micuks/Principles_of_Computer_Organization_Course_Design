@@ -83,10 +83,23 @@ module cpu (
 
     case (sw)
       3'b100: begin
-        $display("sw[%3b]", sw);
+        sbus <= 1'b1;
+        sel3 <= st0;
+        sel2 <= w2;
+        sel1 <= (~st0 & w1) | (st0 & w2);
+        sel0 <= w1;
+        selctl <= 1'b1;
+        drw <= 1'b1;
+        stop <= 1'b1;
+        sst0 <= ~st0 & w2;
       end
       3'b011: begin
-        $display("sw[%3b]", sw);
+        sel3   <= w2;
+        sel2   <= 1'b0;
+        sel1   <= w2;
+        sel0   <= 1'b1;
+        selctl <= 1'b1;
+        stop   <= 1'b1;
       end
       3'b010: begin
         sbus <= ~st0 & w1;
