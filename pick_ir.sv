@@ -14,7 +14,9 @@ function bool_func;
     // end
     // bool_func = result;
     bool_func = (ir == sign);
-    $display("ir[%4b] == sign[%4b] ? %1b", ir, sign, bool_func);
+    if (sign == 4'b0010) begin
+      $display("ir[%4b] == sign[%4b] ? %1b", ir, sign, bool_func);
+    end
   end
 endfunction
 

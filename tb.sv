@@ -79,6 +79,15 @@ module cpu_tb;
       .sel2(sel2),
       .sel3(sel3)
   );
+  initial begin
+    clr = 0;
+    t3  = 0;
+    w1  = 0;
+    w2  = 0;
+    w3  = 0;
+
+    #20 clr = 1;
+  end
   // clock t3
   always begin
     // t3 rise
@@ -115,19 +124,11 @@ module cpu_tb;
 
   // begin simulate
   initial begin
-    clr = 0;
-    t3  = 0;
-    w1  = 0;
-    w2  = 0;
-    w3  = 0;
-
-    #20 clr = 1;
-
     $display("begin simulation");
     swa = 0;
     swb = 0;
     swc = 0;
-    ir  = 4'b0001;
+    ir  = 4'b0010;
     $display("ir[%4b]", ir);
     #period;
     $finish;
