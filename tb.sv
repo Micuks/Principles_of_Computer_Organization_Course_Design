@@ -79,33 +79,39 @@ module cpu_tb;
       .sel2(sel2),
       .sel3(sel3)
   );
-
-  // define clock
+  // clock t3
   always begin
-    // t3, w1 rise
+    // t3 rise
+    #20 t3 = !t3;
+    // t3 fall
     #10 t3 = !t3;
+  end
+
+  // clock w1, w2, w3
+  always begin
+    // w1 rise
     w1 = !w1;
-    // t3, w1 fall
-    #10 t3 = !t3;
-    w1 = !w1;
+    // w1 fall
+    #30 w1 = !w1;
 
     if (!short) begin
-      // t3, w2 rise
-      #10 t3 = !t3;
+      // w2 rise
       w2 = !w2;
-      // t3, w2 fall
-      #10 t3 = !t3;
-      w2 = !w2;
+      // w2 fall
+      #30 w2 = !w2;
 
       if (long) begin
-        // t3, w3 rise
-        t3 = !t3;
+        // w3 rise
         w3 = !w3;
-        // t3, w3 fall
-        t3 = !t3;
-        w3 = !w3;
+        // w3 fall
+        #30 w3 = !w3;
+      end else begin
+        #30;
       end
+    end else begin
+      #60;
     end
+    #60;
   end
 
   // begin simulate
@@ -125,6 +131,7 @@ module cpu_tb;
     ir  = 4'b0001;
     $display("ir[%4b]", ir);
     #period;
+    $finish;
 
     ir = 4'b0010;
     $display("ir[%4b]", ir);
