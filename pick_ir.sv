@@ -147,33 +147,33 @@ task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin
   pcinc <= w1;
   short <= 0;
 
-  s[3] <= ((w2 && (bool_func(  //0001,0010,0101,0110(w3),1001,1011
-      ir, 0001
+  s[3] <= ((w2 && (bool_func(  //add,aand,ld,st(w3),jmp,dec
+      ir, add
   ) || bool_func(
-      ir, 0010
+      ir, aand
   ) || bool_func(
-      ir, 0101
+      ir, ld
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1011
+      ir, dec
   ))) || w3 && bool_func(
-      ir, 0110
+      ir, st
   ));
 >>>>>>> d5257de (rewrite bool_func)
 
   s[2] <= (w2 && (bool_func(
-      ir, 0010
+      ir, sub
   ) || bool_func(
-      ir, 0110
+      ir, st
   ) || bool_func(
-      ir, 1001
+      ir, jmp
   ) || bool_func(
-      ir, 1010
+      ir, axor
   ) || bool_func(
-      ir, 1011
+      ir, dec
   )));
 
   s[1] <= ((w2 && (bool_func(
