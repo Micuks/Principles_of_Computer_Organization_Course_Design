@@ -107,8 +107,58 @@ module cpu (
   localparam rsto2 = 8'b00000010;
   localparam pc = 8'b00000000;
 
-  assign lir = w1;
-  assign pcinc = w1;
+  assign lir = (w1 && (bool_func(
+      ir, add
+  ) || bool_func(
+      ir, sub
+  ) || bool_func(
+      ir, aand
+  ) || bool_func(
+      ir, inc
+  ) || bool_func(
+      ir, ld
+  ) || bool_func(
+      ir, st
+  ) || bool_func(
+      ir, jc
+  ) || bool_func(
+      ir, jz
+  ) || bool_func(
+      ir, jmp
+  ) || bool_func(
+      ir, axor
+  ) || bool_func(
+      ir, dec
+  ) || bool_func(
+      ir, stp
+  )));
+
+  assign pcinc = (w1 && (bool_func(
+      ir, add
+  ) || bool_func(
+      ir, sub
+  ) || bool_func(
+      ir, aand
+  ) || bool_func(
+      ir, inc
+  ) || bool_func(
+      ir, ld
+  ) || bool_func(
+      ir, st
+  ) || bool_func(
+      ir, jc
+  ) || bool_func(
+      ir, jz
+  ) || bool_func(
+      ir, jmp
+  ) || bool_func(
+      ir, axor
+  ) || bool_func(
+      ir, dec
+  ) || bool_func(
+      ir, stp
+  )));
+
 
   assign s[3] = ((w2 && (bool_func(
       union_ir, add
