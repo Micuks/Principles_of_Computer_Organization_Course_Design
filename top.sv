@@ -95,7 +95,7 @@ module cpu (
   localparam wsto1 = 8'b00000100;
   localparam wsto2 = 8'b00000101;
   localparam rsto1 = 8'b00000010;
-  localparam rsto2 = 8'b00000010;
+  localparam rsto2 = 8'b00000011;
   localparam pc = 8'b00000000;
   localparam spc = 8'b00000001;
 
