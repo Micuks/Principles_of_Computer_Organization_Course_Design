@@ -10,51 +10,60 @@ endfunction
 
 module cpu (
     input clr,
-    input t3,
-    input swa,
-    input swb,
-    input swc,
+    t3,
+    swa,
+    swb,
+    swc,
     input [7:4] ir,
     input w1,
-    input w2,
-    input w3,
-    input c,
-    input z,
-    output reg drw,
-    output reg pcinc,
-    output reg lpc,
-    output reg lar,
-    output reg pcadd,
-    output reg arinc,
-    output reg selctl,
-    output reg memw,
-    output reg stop,
-    output reg lir,
-    output reg ldz,
-    output reg ldc,
-    output reg cin,
+    w2,
+    w3,
+    c,
+    z,
+    output pcinc,
+    lpc,
+    lar,
+    pcadd,
+    arinc,
+    selctl,
+    memw,
+    stop,
+    lir,
+    ldz,
+    ldc,
+    cin,
     output reg [3:0] s,
     output reg m,
-    output reg abus,
-    output reg sbus,
-    output reg mbus,
-    output reg short,
-    output reg long,
-    output reg sel0,
-    output reg sel1,
-    output reg sel2,
-    output reg sel3
+    abus,
+    sbus,
+    mbus,
+    short,
+    long,
+    sel0,
+    sel1,
+    sel2,
+    sel3
 );
 
   // `include "pick_ir.sv"
   reg st0;
   reg sst0;
   wire [2:0] sw;
-  wire union_ir;
+  wire [7:0] union_ir;
 
   assign sw = {swc, swb, swa};
 
   assign union_ir = {ir[7:4], sw[2:0], st0};
+
+  // reg is_clr;  // 1 when clr==0, 0 when clr==1
+
+  // always @(clr) begin
+  //   if (!clr) begin
+  //     is_clr = 1'b1;
+  //   end else begin
+  //     is_clr = 1'b0;
+  //   end
+  // end
 
   always @(negedge clr, posedge t3) begin
     if (!clr) begin
@@ -97,32 +106,22 @@ module cpu (
   localparam rsto2 = 8'b00000010;
   localparam pc = 8'b00000000;
 
-  // wire en_add, en_sub, en_aand, en_inc, en_ld, en_st, en_jc, en_jz, en_jmp, en_axor, en_dec, en_stp, en_wreg1, en_wreg2, en_rreg, en_wsto1, en_rsto1, en_rsto2, en_pc;
-  // assign en_add = bool_func(union_ir, add);
-  // assign en_aand = bool_func(union_ir, aand);
-  // assign en_ld = bool_func(union_ir, ld);
-  // assign en_st = bool_func(union_ir, st);
-  // assign en_jmp = bool_func(union_ir, jmp);
-  // assign en_dec = bool_func(union_ir, dec);
+  wire en_add, en_sub, en_aand, en_inc, en_ld, en_st, en_jc,
+  en_jz, en_jmp, en_axor, en_dec, en_stp, en_wreg1, en_wreg2,
+  en_rreg, en_wsto1, en_rsto1, en_rsto2, en_pc;
+
+  assign en_add = bool_func(union_ir, add);
+  assign en_aand = bool_func(union_ir, aand);
+  assign en_ld = bool_func(union_ir, ld);
+  assign en_st = bool_func(union_ir, st);
+  assign en_jmp = bool_func(union_ir, jmp);
+  assign en_dec = bool_func(union_ir, dec);
 
   assign lir = w1;
   assign pcinc = w1;
 
-  assign s[3] = ((w2 && (bool_func(
-      union_ir, add
-  ) || bool_func(
-      union_ir, aand
-  ) || bool_func(
-      union_ir, ld
-  ) || bool_func(
-      union_ir, st
-  ) || bool_func(
-      union_ir, jmp
-  ) || bool_func(
-      union_ir, dec
-  ))) || w3 && bool_func(
-      union_ir, st
-  ));
+  assign s[3] = ((w2 & (en_add | en_aand | en_ld | en_st | en_jmp | en_dec | en_st)) |
+  (w3 & en_st));
 
   assign s[2] = (w2 && (bool_func(
       union_ir, sub
