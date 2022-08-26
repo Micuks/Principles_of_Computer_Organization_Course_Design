@@ -126,6 +126,14 @@ module cpu_tb;
   initial begin
     $display("begin simulation");
     swa = 0;
+    swb = 1;
+    swc = 0;
+    ir = 8'b00000100;
+    $display("ir[%8b]", ir);
+    #period;
+    $finish:
+
+    swa = 0;
     swb = 0;
     swc = 0;
     ir  = 8'b00010000;
