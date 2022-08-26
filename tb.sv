@@ -3,7 +3,7 @@
 
 module cpu_tb;
   `include "top.sv"
-  reg [7:4] ir;
+  reg [7:0] ir;
   reg [3:0] s;
   reg
       clr,
@@ -128,29 +128,29 @@ module cpu_tb;
     swa = 0;
     swb = 0;
     swc = 0;
-    ir  = 4'b0010;
-    $display("ir[%4b]", ir);
+    ir  = 8'b00010000;
+    $display("ir[%8b]", ir);
     #period;
     $finish;
 
-    ir = 4'b0010;
-    $display("ir[%4b]", ir);
+    ir = 8'b00100000;
+    $display("ir[%8b]", ir);
     #period;
 
-    ir = 4'b0011;
-    $display("ir[%4b]", ir);
+    ir = 8'b00110000;
+    $display("ir[%8b]", ir);
     #period;
 
-    ir = 4'b0100;
-    $display("ir[%4b]", ir);
+    ir = 8'b01000000;
+    $display("ir[%8b]", ir);
     #period;
 
-    ir = 4'b0101;
-    $display("ir[%4b]", ir);
+    ir = 8'b01010000;
+    $display("ir[%8b]", ir);
     #period;
 
-    ir = 4'b0110;
-    $display("ir[%4b]", ir);
+    ir = 8'b01100000;
+    $display("ir[%8b]", ir);
     #period;
 
     $finish;
