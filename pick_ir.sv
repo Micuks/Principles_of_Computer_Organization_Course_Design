@@ -2,7 +2,6 @@
 
 function bool_func;
 
-<<<<<<< HEAD
   input [7:0] ir;
   input [7:0] sign;
 
@@ -124,45 +123,6 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
   ) || bool_func(
       ir, dec
   )));
-=======
-  input [7:4] ir;
-  input [7:4] sign;
-
-  //   integer i;
-  //   reg result = 1;
-  begin
-    // for (i = 7; i > 3; i = i - 1) begin
-    //   result = result && (sign[i]) ? ir[i] : !ir[i];
-    //   $display("sign[%0d] = %0b", i, sign[i]);
-    // end
-    // bool_func = result;
-    bool_func = (ir == sign);
-  end
-endfunction
-
-task pick_ir_st0_1(input [7:4] ir, output lir, pcinc, output [3:0] s, output cin, abus, drw, ldz,
-                   ldc, m, lar, long, input c, output pcadd, input z, output lpc, stop, mbus, memw,
-                   input w1, w2, w3, output short);
-  lir <= w1;
-  pcinc <= w1;
-  short <= 0;
-
-  s[3] <= ((w2 && (bool_func(  //add,aand,ld,st(w3),jmp,dec
-      ir, add
-  ) || bool_func(
-      ir, aand
-  ) || bool_func(
-      ir, ld
-  ) || bool_func(
-      ir, st
-  ) || bool_func(
-      ir, jmp
-  ) || bool_func(
-      ir, dec
-  ))) || w3 && bool_func(
-      ir, st
-  ));
->>>>>>> d5257de (rewrite bool_func)
 
   s[2] <= (w2 && (bool_func(
       ir, sub
