@@ -53,6 +53,8 @@ module cpu(
 	wire ST0_next;
 	reg is_clr;
 
+	// 设置is_clr
+	// is_clr 置1后 write_reg read_reg write_mem read_mem ins_fetch 均为0
 	always @(CLR) begin
 		if(CLR == 1)
 			is_clr <= 0;
@@ -60,14 +62,12 @@ module cpu(
 			is_clr <= 1;
 	end
 	
+	// 状态转换
 	always @(negedge T3) begin
-		ST0 <= ST0_next;
-		// if((write_reg && W[2]) || ((read_mem || write_mem) && W[1]))
-		// 	ST0 <= 1;
-		// else
-		// 	ST0 <= 0;
+		ST0 <= ST0_next;	
 	end
 
+	// ST0次态逻辑
 	assign ST0_next = (write_reg && ST0 == 0 && W[2]) || ((read_mem || write_mem) && ST0 == 0 && W[1]) 
 	|| (write_reg && ST0 == 1 && W[1]) || (ins_fetch && ST0 == 0 && W[1]) || ((read_mem || write_mem) && ST0 && W[1])
 	|| (ins_fetch && (W[2] || W[3]));
@@ -100,14 +100,15 @@ module cpu(
 	assign LAR = ((LD || ST) && W[2] ) || ((read_mem||write_mem) && !ST0 && W[1]);
 	assign ARINC = (read_mem || write_mem) && ST0;
 	assign LIR = ins_fetch && W[1] && ST0;
-	assign LDZ = ins_fetch && (ADD || SUB || AND || INC || OR || CMP) && W[2];
-	assign LDC = ins_fetch && (ADD || SUB || INC || CMP) && W[2];
-	assign CIN = (ins_fetch && ADD && W[2]);
-	assign M = ins_fetch && (((AND || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ST && W[3]));
-	assign MEMW = (ins_fetch && ST && W[3]) || (write_mem && ST0 && W[1]);
-	assign ABUS = (ins_fetch && (ADD  || SUB || AND || INC || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ins_fetch && ST && W[3]);
-	assign MBUS = (ins_fetch && LD && W[3]) || (read_mem && ST0);
+	assign LDZ = (ADD || SUB || AND || INC || OR || CMP) && W[2];
+	assign LDC = (ADD || SUB || INC || CMP) && W[2];
+	assign CIN = ADD && W[2];
+	assign M =  ((AND || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ST && W[3]);
+	assign MEMW = (ST && W[3]) || (write_mem && ST0 && W[1]);
+	assign ABUS = ((ADD  || SUB || AND || INC || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ST && W[3]);
+	assign MBUS = (LD && W[3]) || (read_mem && ST0);
 	
+	// 运算器模式
 	reg [7:4]S_temp;
 	always @(IR or W) begin
 		if(W[2]) begin
@@ -139,23 +140,23 @@ module cpu(
 	assign S = S_temp;
 
 	// 各个指令状态
-	assign ADD = IR == 4'b0001;
-	assign SUB = IR == 4'b0010;
-	assign AND = IR == 4'b0011;
-	assign INC = IR == 4'b0100;
-	assign LD = IR == 4'b0101;
-	assign ST = IR == 4'b0110;
-	assign JC = IR == 4'b0111;
-	assign JZ = IR == 4'b1000;
-	assign JMP = IR == 4'b1001;
-	assign STP = IR == 4'b1110;
+	assign ADD = (IR == 4'b0001) && ins_fetch;
+	assign SUB = (IR == 4'b0010) && ins_fetch;
+	assign AND = (IR == 4'b0011) && ins_fetch;
+	assign INC = (IR == 4'b0100) && ins_fetch;
+	assign LD = (IR == 4'b0101) && ins_fetch;
+	assign ST = (IR == 4'b0110) && ins_fetch;
+	assign JC = (IR == 4'b0111) && ins_fetch;
+	assign JZ = (IR == 4'b1000) && ins_fetch;
+	assign JMP = (IR == 4'b1001) && ins_fetch;
+	assign STP = (IR == 4'b1110) && ins_fetch;
 
 	// 附加指令
-	assign NOP = IR == 4'b0000;
-	assign OUT = IR == 4'b1010;
-	assign OR = IR == 4'b1011;
-	assign CMP = IR == 4'b1100;
-	assign MOV = IR == 4'b1101;
+	assign NOP = (IR == 4'b0000) && ins_fetch;
+	assign OUT = (IR == 4'b1010) && ins_fetch;
+	assign OR = (IR == 4'b1011) && ins_fetch;
+	assign CMP = (IR == 4'b1100) && ins_fetch;
+	assign MOV = (IR == 4'b1101) && ins_fetch;
 
 endmodule
 
