@@ -377,7 +377,7 @@ module cpu (
       union_ir, wreg2
   ) || bool_func(
       union_ir, pc
-  ) || bool_func(
+  ))) || (w2 && (bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
