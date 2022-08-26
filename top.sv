@@ -110,55 +110,55 @@ module cpu (
   localparam spc = 8'b00000001;
 
   assign lir = (w1 && (bool_func(
-      ir, add
+      union_ir, add
   ) || bool_func(
-      ir, sub
+      union_ir, sub
   ) || bool_func(
-      ir, aand
+      union_ir, aand
   ) || bool_func(
-      ir, inc
+      union_ir, inc
   ) || bool_func(
-      ir, ld
+      union_ir, ld
   ) || bool_func(
-      ir, st
+      union_ir, st
   ) || bool_func(
-      ir, jc
+      union_ir, jc
   ) || bool_func(
-      ir, jz
+      union_ir, jz
   ) || bool_func(
-      ir, jmp
+      union_ir, jmp
   ) || bool_func(
-      ir, axor
+      union_ir, axor
   ) || bool_func(
-      ir, dec
+      union_ir, dec
   ) || bool_func(
-      ir, stp
+      union_ir, stp
   )));
 
   assign pcinc = (w1 && (bool_func(
-      ir, add
+      union_ir, add
   ) || bool_func(
-      ir, sub
+      union_ir, sub
   ) || bool_func(
-      ir, aand
+      union_ir, aand
   ) || bool_func(
-      ir, inc
+      union_ir, inc
   ) || bool_func(
-      ir, ld
+      union_ir, ld
   ) || bool_func(
-      ir, st
+      union_ir, st
   ) || bool_func(
-      ir, jc
+      union_ir, jc
   ) || bool_func(
-      ir, jz
+      union_ir, jz
   ) || bool_func(
-      ir, jmp
+      union_ir, jmp
   ) || bool_func(
-      ir, axor
+      union_ir, axor
   ) || bool_func(
-      ir, dec
+      union_ir, dec
   ) || bool_func(
-      ir, stp
+      union_ir, stp
   )));
 
 
