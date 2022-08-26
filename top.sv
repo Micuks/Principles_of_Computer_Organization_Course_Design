@@ -376,6 +376,8 @@ module cpu (
   assign sbus = (w1 && (bool_func(
       union_ir, wsto1
   ) || bool_func(
+      union_ir, wsto2
+  ) || bool_func(
       union_ir, rsto1
   ) || bool_func(
       union_ir, wreg1
