@@ -92,10 +92,10 @@ module cpu (
   localparam wreg1 = 8'b00001000;
   localparam wreg2 = 8'b00001001;
   localparam rreg = 8'b00000110;
-  localparam wsto1 = 8'b00000100;
-  localparam wsto2 = 8'b00000101;
-  localparam rsto1 = 8'b00000010;
-  localparam rsto2 = 8'b00000011;
+  localparam rsto1 = 8'b00000100;
+  localparam rsto2 = 8'b00000101;
+  localparam wsto1 = 8'b00000010;
+  localparam wsto2 = 8'b00000011;
   localparam pc = 8'b00000000;
   localparam spc = 8'b00000001;
 
@@ -345,9 +345,9 @@ module cpu (
       union_ir, rreg
   )));
 
-  assign mbus = (w1 && bool_func(union_ir, wsto2)) || (w3 && bool_func(union_ir, ld));
+  assign mbus = (w1 && bool_func(union_ir, rsto2)) || (w3 && bool_func(union_ir, ld));
 
-  assign memw = (w1 && bool_func(union_ir, rsto2)) || (w3 && bool_func(union_ir, st));
+  assign memw = (w1 && bool_func(union_ir, wsto2)) || (w3 && bool_func(union_ir, st));
 
   assign arinc = (w1 && (bool_func(union_ir, rsto2) || bool_func(union_ir, wsto2)));
 
