@@ -56,20 +56,10 @@ module cpu (
 
   assign union_ir = {ir[7:4], sw[2:0], st0};
 
-  // reg is_clr;  // 1 when clr==0, 0 when clr==1
-
-  // always @(clr) begin
-  //   if (!clr) begin
-  //     is_clr = 1'b1;
-  //   end else begin
-  //     is_clr = 1'b0;
-  //   end
-  // end
-
-  always @(negedge clr, posedge t3) begin
+  always @(negedge clr, negedge t3) begin
     if (!clr) begin
       st0 <= 1'b0;
-    end else if (t3) begin
+    end else if (!t3) begin
       if (st0 == 1'b1 && w2 == 1'b1 && sw == 3'b100) begin
         st0 <= 1'b0;
       end
