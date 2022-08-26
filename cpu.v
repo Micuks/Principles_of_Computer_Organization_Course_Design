@@ -20,8 +20,8 @@
  ABUS, SBUS, MBUS,    总线控制
  SHORT, LONG,         拍数控制
 --------------------------------------------------------------------
--- S                    S3~S0选择ALU计算模式
--- SEL                  选择R和MUX
+ S                    S3~S0选择ALU计算模式
+ SEL                  选择R和MUX
 -- --------------------------------------------------------------------
 */
 
@@ -47,7 +47,7 @@ module cpu(
 	wire write_reg,read_reg,write_mem,read_mem,ins_fetch; 
 	// 现在执行哪条指令
 	wire ADD,SUB,AND,INC,LD,ST,JC,JZ,JMP,STP;
-	// wire NOP,OUT,OR,CMP,MOV; // 附加指令
+	wire NOP,OUT,OR,CMP,MOV; // 附加指令
 
 	reg ST0;
 	wire ST0_next;
@@ -87,7 +87,7 @@ module cpu(
 	assign SEL[2] = (write_reg && W[2]);
 	assign SEL[3] = (write_reg && ST0 ) || (read_reg && W[2]) ;
 
-	assign DRW = write_reg || ((ADD || SUB || AND || INC ) && W[2]) || (LD && W[3]);
+	assign DRW = write_reg || ((ADD || SUB || AND || INC || OR || MOV) && W[2]) || (LD && W[3]);
 	assign SBUS = write_reg || (ins_fetch && !ST0 && W[1]) || (read_mem && !ST0 && W[1]) || (write_mem && W[1]);
 	assign SELCTL = SW != 3'b000;
 
@@ -100,18 +100,19 @@ module cpu(
 	assign LAR = ((LD || ST) && W[2] ) || ((read_mem||write_mem) && !ST0 && W[1]);
 	assign ARINC = (read_mem || write_mem) && ST0;
 	assign LIR = ins_fetch && W[1] && ST0;
-	assign LDZ = ins_fetch && (ADD || SUB || AND || INC) && W[2];
-	assign LDC = ins_fetch && (ADD || SUB || INC) && W[2];
+	assign LDZ = ins_fetch && (ADD || SUB || AND || INC || OR || CMP) && W[2];
+	assign LDC = ins_fetch && (ADD || SUB || INC || CMP) && W[2];
 	assign CIN = (ins_fetch && ADD && W[2]);
-	assign M = ins_fetch && (((AND || LD || ST || JMP ) && W[2]) || (ST && W[3]));
+	assign M = ins_fetch && (((AND || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ST && W[3]));
 	assign MEMW = (ins_fetch && ST && W[3]) || (write_mem && ST0 && W[1]);
-	assign ABUS = (ins_fetch && (ADD  || SUB || AND || INC || LD || ST || JMP) && W[2]) || (ins_fetch && ST && W[3]);
+	assign ABUS = (ins_fetch && (ADD  || SUB || AND || INC || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ins_fetch && ST && W[3]);
 	assign MBUS = (ins_fetch && LD && W[3]) || (read_mem && ST0);
 	
 	reg [7:4]S_temp;
 	always @(IR or W) begin
 		if(W[2]) begin
 			case (IR)
+				4'b0000: S_temp <= 4'b0000;
 				4'b0001: S_temp <= 4'b1001;
 				4'b0010: S_temp <= 4'b0110;
 				4'b0011: S_temp <= 4'b1011;
@@ -119,6 +120,11 @@ module cpu(
 				4'b0101: S_temp <= 4'b1010;
 				4'b0110: S_temp <= 4'b1111;
 				
+				4'b1010: S_temp <= 4'b1010;
+				4'b1011: S_temp <= 4'b1110;
+				4'b1100: S_temp <= 4'b0110;
+				4'b1101: S_temp <= 4'b1010;
+
 				4'b1001: S_temp <= 4'b1111;
 				default: S_temp <= 4'b1111;
 			endcase
@@ -137,13 +143,19 @@ module cpu(
 	assign SUB = IR == 4'b0010;
 	assign AND = IR == 4'b0011;
 	assign INC = IR == 4'b0100;
-	assign LD = IR == 4'b101;
+	assign LD = IR == 4'b0101;
 	assign ST = IR == 4'b0110;
 	assign JC = IR == 4'b0111;
 	assign JZ = IR == 4'b1000;
 	assign JMP = IR == 4'b1001;
 	assign STP = IR == 4'b1110;
 
+	// 附加指令
+	assign NOP = IR == 4'b0000;
+	assign OUT = IR == 4'b1010;
+	assign OR = IR == 4'b1011;
+	assign CMP = IR == 4'b1100;
+	assign MOV = IR == 4'b1101;
 
 endmodule
 
