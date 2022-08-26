@@ -7,6 +7,9 @@ function bool_func;
 
   begin
     bool_func = (ir[7:0] == sign[7:0]) ? 1'b1 : 1'b0;
+    if (bool_func) begin
+      //   $display("ir[%4b] == sign[%4b] ? %1b", ir, sign, bool_func);
+    end
   end
 endfunction
 
@@ -30,14 +33,68 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
   localparam wreg1 = 8'b00001000;
   localparam wreg2 = 8'b00001001;
   localparam rreg = 8'b00000110;
-  localparam wsto1 = 8'b00000100;
-  localparam wsto2 = 8'b00000101;
-  localparam rsto1 = 8'b00000010;
-  localparam rsto2 = 8'b00000010;
+  localparam wsto1 = 8'b00000010;
+  localparam wsto2 = 8'b00000011;
+  localparam rsto1 = 8'b00000100;
+  localparam rsto2 = 8'b00000101;
   localparam pc = 8'b00000000;
+  localparam spc = 8'b00000001;
 
-  lir <= w1;
-  pcinc <= w1;
+  lir <= (w1 && (bool_func(
+      ir, add
+  ) || bool_func(
+      ir, sub
+  ) || bool_func(
+      ir, aand
+  ) || bool_func(
+      ir, inc
+  ) || bool_func(
+      ir, ld
+  ) || bool_func(
+      ir, st
+  ) || bool_func(
+      ir, jc
+  ) || bool_func(
+      ir, jz
+  ) || bool_func(
+      ir, jmp
+  ) || bool_func(
+      ir, axor
+  ) || bool_func(
+      ir, dec
+  ) || bool_func(
+      ir, stp
+  ) || bool_func(
+      ir, spc
+  )));
+
+  pcinc <= (w1 && (bool_func(
+      ir, add
+  ) || bool_func(
+      ir, sub
+  ) || bool_func(
+      ir, aand
+  ) || bool_func(
+      ir, inc
+  ) || bool_func(
+      ir, ld
+  ) || bool_func(
+      ir, st
+  ) || bool_func(
+      ir, jc
+  ) || bool_func(
+      ir, jz
+  ) || bool_func(
+      ir, jmp
+  ) || bool_func(
+      ir, axor
+  ) || bool_func(
+      ir, dec
+  ) || bool_func(
+      ir, stp
+  ) || bool_func(
+      ir, spc
+  )));
 
   s[3] <= ((w2 && (bool_func(
       ir, add
@@ -51,9 +108,9 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
       ir, jmp
   ) || bool_func(
       ir, dec
-  ))) || w3 && bool_func(
+  ))) || (w3 && bool_func(
       ir, st
-  ));
+  )));
 
   s[2] <= (w2 && (bool_func(
       ir, sub
@@ -227,9 +284,9 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
       ir, rreg
   )));
 
-  mbus <= (w1 && bool_func(ir, wsto2)) || (w3 && bool_func(ir, ld));
+  mbus <= (w1 && bool_func(ir, rsto2)) || (w3 && bool_func(ir, ld));
 
-  memw <= (w1 && bool_func(ir, rsto2)) || (w3 && bool_func(ir, st));
+  memw <= (w1 && bool_func(ir, wsto2)) || (w3 && bool_func(ir, st));
 
   arinc <= (w1 && bool_func(ir, rsto2) || bool_func(ir, wsto2));
 
@@ -252,9 +309,17 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
   ) || bool_func(
       ir, rsto1
   ) || bool_func(
-      ir, rsto2
+      ir, wsto2
+  ) || bool_func(
+      ir, wreg1
+  ) || bool_func(
+      ir, wreg2
   ) || bool_func(
       ir, pc
+  ))) || (w2 && (bool_func(
+      ir, wreg1
+  ) || bool_func(
+      ir, wreg2
   )));
 
   short <= (w1 && (bool_func(
@@ -269,7 +334,9 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
       ir, pc
   )));
 
-  sel3 <= (w1 && (bool_func(ir, wreg2))) || (w2 && (bool_func(ir, wreg2) || bool_func(ir, rreg)));
+  sel3 <= (w1 && (bool_func(ir, wreg2))) ||
+  (w2 && (bool_func(ir, wreg2) ||
+  bool_func(ir, rreg)));
 
   sel2 <= (w2 && (bool_func(ir, wreg2) || bool_func(ir, wreg1)));
 
@@ -291,7 +358,7 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
       ir, rsto1
   ) || bool_func(
       ir, pc
-  ))) && (w2 && bool_func(
+  ))) || (w2 && bool_func(
       ir, wreg1
   ));
 endtask

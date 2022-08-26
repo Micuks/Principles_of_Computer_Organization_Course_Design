@@ -370,9 +370,17 @@ module cpu (
   ) || bool_func(
       union_ir, rsto1
   ) || bool_func(
-      union_ir, rsto2
+      union_ir, wsto2
+  ) || bool_func(
+      union_ir, wreg1
+  ) || bool_func(
+      union_ir, wreg2
   ) || bool_func(
       union_ir, pc
+  ) || bool_func(
+      union_ir, wreg1
+  ) || bool_func(
+      union_ir, wreg2
   )));
 
   assign short = (w1 && (bool_func(
@@ -421,8 +429,6 @@ module cpu (
       union_ir, rsto1
   ) || bool_func(
       union_ir, pc
-  ) || bool_func(
-      union_ir, spc
   ))) || (w2 && bool_func(
       union_ir, wreg1
   ));
