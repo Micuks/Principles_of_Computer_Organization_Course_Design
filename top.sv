@@ -123,6 +123,8 @@ module cpu (
       union_ir, dec
   ) || bool_func(
       union_ir, stp
+  ) || bool_func(
+      union_ir, spc
   )));
 
   assign pcinc = (w1 && (bool_func(
@@ -149,6 +151,8 @@ module cpu (
       union_ir, dec
   ) || bool_func(
       union_ir, stp
+  ) || bool_func(
+      union_ir, spc
   )));
 
 
