@@ -20,7 +20,8 @@ module cpu (
     w3,
     c,
     z,
-    output pcinc,
+    output drw,
+    pcinc,
     lpc,
     lar,
     pcadd,
@@ -106,22 +107,25 @@ module cpu (
   localparam rsto2 = 8'b00000010;
   localparam pc = 8'b00000000;
 
-  wire en_add, en_sub, en_aand, en_inc, en_ld, en_st, en_jc,
-  en_jz, en_jmp, en_axor, en_dec, en_stp, en_wreg1, en_wreg2,
-  en_rreg, en_wsto1, en_rsto1, en_rsto2, en_pc;
-
-  assign en_add = bool_func(union_ir, add);
-  assign en_aand = bool_func(union_ir, aand);
-  assign en_ld = bool_func(union_ir, ld);
-  assign en_st = bool_func(union_ir, st);
-  assign en_jmp = bool_func(union_ir, jmp);
-  assign en_dec = bool_func(union_ir, dec);
-
   assign lir = w1;
   assign pcinc = w1;
 
-  assign s[3] = ((w2 & (en_add | en_aand | en_ld | en_st | en_jmp | en_dec | en_st)) |
-  (w3 & en_st));
+  assign s[3] = ((w2 && (bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, dec
+  ))) || w3 && bool_func(
+      union_ir, st
+  ));
+
 
   assign s[2] = (w2 && (bool_func(
       union_ir, sub
