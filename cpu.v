@@ -60,19 +60,17 @@ module cpu(
 			is_clr <= 1;
 	end
 	
-	always @(negedge T3 or negedge CLR) begin
-		if(CLR == 0)
-			ST0 <= 0;
-		else
-			ST0 <= ST0_next;
+	always @(negedge T3) begin
+		ST0 <= ST0_next;
 		// if((write_reg && W[2]) || ((read_mem || write_mem) && W[1]))
 		// 	ST0 <= 1;
 		// else
 		// 	ST0 <= 0;
 	end
 
-	assign ST0_next = (write_reg && ST0 == 0 && W[2]) || (write_reg && ST0 == 1 && W[1]) || ((read_mem || write_mem) && W[1]) || (ins_fetch && !ST0) ;
-	//((read_mem || write_mem) && ST0 == 0 && W[1]) || (write_reg && ST0 == 1 && W[1]) || (ins_fetch && ST0 == 0 && W[1]) || ((read_mem || write_mem) && ST0 && W[1]) || (ins_fetch && (W[2] || W[3]));
+	assign ST0_next = (write_reg && ST0 == 0 && W[2]) || ((read_mem || write_mem) && ST0 == 0 && W[1]) 
+	|| (write_reg && ST0 == 1 && W[1]) || (ins_fetch && ST0 == 0 && W[1]) || ((read_mem || write_mem) && ST0 && W[1])
+	|| (ins_fetch && (W[2] || W[3]));
 
 	// 控制台操作模式
 	assign write_reg = (SW == 3'b100 && !is_clr );
@@ -82,9 +80,9 @@ module cpu(
 	assign ins_fetch = (SW == 3'b000 && !is_clr) ;
 
 	// 各操作信号产生逻辑
-	assign STOP = is_clr || (!(ins_fetch && STP && W[2]) && !(W[1] && ins_fetch && ST0));
+	assign STOP = is_clr || (!ins_fetch) || (ins_fetch && STP && W[2]); //(!(ins_fetch && STP && W[2]) && !(W[1] && ins_fetch && ST0));
 	// 选择寄存器
-	assign SEL[0] = ((write_reg || read_reg) && W[1]) || (read_reg && W[2]);
+	assign SEL[0] = ((write_reg || read_reg) && W[1]) || (read_reg && W[2]) ;
 	assign SEL[1] = (write_reg && !ST0 && W[1]) || (W[2] && write_reg && ST0) || (read_reg && W[2] );
 	assign SEL[2] = (write_reg && W[2]);
 	assign SEL[3] = (write_reg && ST0 ) || (read_reg && W[2]) ;
@@ -104,23 +102,27 @@ module cpu(
 	assign LIR = ins_fetch && W[1] && ST0;
 	assign LDZ = ins_fetch && (ADD || SUB || AND || INC) && W[2];
 	assign LDC = ins_fetch && (ADD || SUB || INC) && W[2];
-	assign CIN = ins_fetch && ADD && W[2];
+	assign CIN = (ins_fetch && ADD && W[2]);
 	assign M = ins_fetch && (((AND || LD || ST || JMP ) && W[2]) || (ST && W[3]));
 	assign MEMW = (ins_fetch && ST && W[3]) || (write_mem && ST0 && W[1]);
-	assign ABUS = (ins_fetch && (ADD && AND || LD || ST || JMP) && W[2]) || (ins_fetch && ST && W[3]);
+	assign ABUS = (ins_fetch && (ADD  || SUB || AND || LD || ST || JMP) && W[2]) || (ins_fetch && ST && W[3]);
 	assign MBUS = (ins_fetch && LD && W[3]) || (read_mem && ST0);
 	
-	reg [7:4] S_temp;
-	always @(IR/*IR[7] or IR[6] or IR[5] or IR[4]*/) begin
+	reg [7:4]S_temp;
+	always @(IR) begin
+		
 		case (IR)
 			4'b0001: S_temp <= 4'b1001;
 			4'b0010: S_temp <= 4'b0110;
 			4'b0011: S_temp <= 4'b1011;
-			4'b1011: S_temp <= 4'b0000;
-			4'b0110: S_temp <= 4'b1111;
+			4'b0100: S_temp <= 4'b0000;
+			4'b0101: S_temp <= 4'b1010;
+			4'b0110: S_temp <= 4'b1010;
+			
 			4'b1001: S_temp <= 4'b1111;
 			default: S_temp <= 4'b1111;
 		endcase
+	
 	end
 	assign S = S_temp;
 
