@@ -97,9 +97,11 @@ module cpu (
   localparam wsto1 = 8'b00000010;
   localparam wsto2 = 8'b00000011;
   localparam pc = 8'b00000000;
-  localparam spc = 8'b00000001;
+  localparam nop = 8'b00000001;
 
   assign lir = (w1 && (bool_func(
+      union_ir, nop
+  ) || bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -107,27 +109,29 @@ module cpu (
       union_ir, aand
   ) || bool_func(
       union_ir, inc
-  ) || bool_func(
-      union_ir, ld
-  ) || bool_func(
-      union_ir, st
-  ) || bool_func(
-      union_ir, jc
-  ) || bool_func(
-      union_ir, jz
-  ) || bool_func(
-      union_ir, jmp
+  ) || (bool_func(
+      union_ir, jc) && ~c
+  ) || (bool_func(
+      union_ir, jz) && ~z
   ) || bool_func(
       union_ir, axor
   ) || bool_func(
       union_ir, dec
+  ))) || (w2 && (bool_func(
+      union_ir, ld
   ) || bool_func(
-      union_ir, stp
+      union_ir, st
+  ) || (bool_func(
+      union_ir, jc) && c
+  ) || (bool_func(
+      union_ir, jz) && z
   ) || bool_func(
-      union_ir, spc
+      union_ir, jmp
   )));
 
   assign pcinc = (w1 && (bool_func(
+      union_ir, nop
+  ) || bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -135,28 +139,28 @@ module cpu (
       union_ir, aand
   ) || bool_func(
       union_ir, inc
-  ) || bool_func(
-      union_ir, ld
-  ) || bool_func(
-      union_ir, st
-  ) || bool_func(
-      union_ir, jc
-  ) || bool_func(
-      union_ir, jz
-  ) || bool_func(
-      union_ir, jmp
+  ) || (bool_func(
+      union_ir, jc) && ~c
+  ) || (bool_func(
+      union_ir, jz) && ~z
   ) || bool_func(
       union_ir, axor
   ) || bool_func(
       union_ir, dec
+  ))) || (w2 && (bool_func(
+      union_ir, ld
   ) || bool_func(
-      union_ir, stp
+      union_ir, st
+  ) || (bool_func(
+      union_ir, jc) && c
+  ) || (bool_func(
+      union_ir, jz) && z
   ) || bool_func(
-      union_ir, spc
+      union_ir, jmp
   )));
 
 
-  assign s[3] = ((w2 && (bool_func(
+  assign s[3] = ((w1 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, aand
@@ -168,12 +172,12 @@ module cpu (
       union_ir, jmp
   ) || bool_func(
       union_ir, dec
-  ))) || (w3 && bool_func(
+  ))) || (w2 && bool_func(
       union_ir, st
   )));
 
 
-  assign s[2] = (w2 && (bool_func(
+  assign s[2] = (w1 && (bool_func(
       union_ir, sub
   ) || bool_func(
       union_ir, st
@@ -185,7 +189,7 @@ module cpu (
       union_ir, dec
   )));
 
-  assign s[1] = ((w2 && (bool_func(
+  assign s[1] = ((w1 && (bool_func(
       union_ir, sub
   ) || bool_func(
       union_ir, aand
@@ -199,11 +203,11 @@ module cpu (
       union_ir, axor
   ) || bool_func(
       union_ir, dec
-  ))) || (w3 && (bool_func(
+  ))) || (w2 && (bool_func(
       union_ir, st
   ))));
 
-  assign s[0] = (w2 && (bool_func(
+  assign s[0] = (w1 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, aand
@@ -215,9 +219,9 @@ module cpu (
       union_ir, dec
   )));
 
-  assign cin = (w2 && (bool_func(union_ir, add) || bool_func(union_ir, dec)));
+  assign cin = (w1 && (bool_func(union_ir, add) || bool_func(union_ir, dec)));
 
-  assign abus = ((w2 && (bool_func(
+  assign abus = ((w1 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -235,7 +239,7 @@ module cpu (
       union_ir, axor
   ) || bool_func(
       union_ir, dec
-  ))) || (w3 && (bool_func(
+  ))) || (w2 && (bool_func(
       union_ir, st
   ))));
 
@@ -243,7 +247,7 @@ module cpu (
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
-  ))) || (w2 && (bool_func(
+  )|| bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -255,15 +259,15 @@ module cpu (
       union_ir, axor
   ) || bool_func(
       union_ir, dec
+  ))) || (w2 && (bool_func(
+      union_ir, ld
   ) || bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
-  ))) || (w3 && (bool_func(
-      union_ir, ld
   ))));
 
-  assign ldz = (w2 && (bool_func(
+  assign ldz = (w1 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -277,7 +281,7 @@ module cpu (
       union_ir, dec
   )));
 
-  assign ldc = (w2 && (bool_func(
+  assign ldc = (w1 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -288,7 +292,7 @@ module cpu (
   )));
   //   $display("w2[%1b] ldc[%1b] union_ir[%4b] b_f(sub)[%1b]", w2, ldc, union_ir, bool_func(union_ir, sub));
 
-  assign m = ((w2 && (bool_func(
+  assign m = ((w1 && (bool_func(
       union_ir, aand
   ) || bool_func(
       union_ir, ld
@@ -298,7 +302,7 @@ module cpu (
       union_ir, jmp
   ) || bool_func(
       union_ir, axor
-  ))) || (w3 && (bool_func(
+  ))) || (w2 && (bool_func(
       union_ir, st
   ))));
   //   $display("w2[%1b] m[%1b] union_ir[%4b] b_f(sub)[%1b]", w2, m, union_ir, bool_func(union_ir, sub));
@@ -307,17 +311,17 @@ module cpu (
       union_ir, wsto1
   ) || bool_func(
       union_ir, rsto1
-  ))) || (w2 && (bool_func(
+  ) || bool_func(
       union_ir, ld
   ) || bool_func(
       union_ir, st
   )));
 
-  assign long = (w2 && (bool_func(union_ir, ld) || bool_func(union_ir, st)));
+  assign long = 1'b0;
 
-  assign pcadd = w2 && ((bool_func(union_ir, jc) && c) || (bool_func(union_ir, jz) && z));
+  assign pcadd = w1 && ((bool_func(union_ir, jc) && c) || (bool_func(union_ir, jz) && z));
 
-  assign lpc = (w1 && bool_func(union_ir, pc)) || (w2 && bool_func(union_ir, jmp));
+  assign lpc = w1 && (bool_func(union_ir, pc) || bool_func(union_ir, jmp));
 
   assign stop = (w1 && (bool_func(
       union_ir, wreg1
@@ -335,9 +339,9 @@ module cpu (
       union_ir, rsto2
   ) || bool_func(
       union_ir, pc
-  ))) || (w2 && (bool_func(
-      union_ir, stp
   ) || bool_func(
+      union_ir, stp
+  ))) || (w2 && (bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
@@ -345,9 +349,9 @@ module cpu (
       union_ir, rreg
   )));
 
-  assign mbus = (w1 && bool_func(union_ir, rsto2)) || (w3 && bool_func(union_ir, ld));
+  assign mbus = (w1 && bool_func(union_ir, rsto2)) || (w2 && bool_func(union_ir, ld));
 
-  assign memw = (w1 && bool_func(union_ir, wsto2)) || (w3 && bool_func(union_ir, st));
+  assign memw = (w1 && bool_func(union_ir, wsto2)) || (w2 && bool_func(union_ir, st));
 
   assign arinc = (w1 && (bool_func(union_ir, rsto2) || bool_func(union_ir, wsto2)));
 
@@ -401,6 +405,26 @@ module cpu (
       union_ir, rsto2
   ) || bool_func(
       union_ir, pc
+  ) || bool_func(
+      union_ir, nop
+  ) || bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || (bool_func(
+      union_ir, jc) && ~c
+  ) || (bool_func(
+      union_ir, jz) && ~z
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
   )));
 
   assign sel3 = (w1 && (bool_func(
