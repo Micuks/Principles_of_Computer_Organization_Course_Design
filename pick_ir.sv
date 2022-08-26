@@ -124,18 +124,6 @@ task pick_ir_st0_1(input [7:0] ir, output lir, pcinc, output [3:0] s, output cin
       ir, dec
   )));
 
-  s[2] <= (w2 && (bool_func(
-      ir, sub
-  ) || bool_func(
-      ir, st
-  ) || bool_func(
-      ir, jmp
-  ) || bool_func(
-      ir, axor
-  ) || bool_func(
-      ir, dec
-  )));
-
   s[1] <= ((w2 && (bool_func(
       ir, sub
   ) || bool_func(
