@@ -105,24 +105,30 @@ module cpu(
 	assign CIN = (ins_fetch && ADD && W[2]);
 	assign M = ins_fetch && (((AND || LD || ST || JMP ) && W[2]) || (ST && W[3]));
 	assign MEMW = (ins_fetch && ST && W[3]) || (write_mem && ST0 && W[1]);
-	assign ABUS = (ins_fetch && (ADD  || SUB || AND || LD || ST || JMP) && W[2]) || (ins_fetch && ST && W[3]);
+	assign ABUS = (ins_fetch && (ADD  || SUB || AND || INC || LD || ST || JMP) && W[2]) || (ins_fetch && ST && W[3]);
 	assign MBUS = (ins_fetch && LD && W[3]) || (read_mem && ST0);
 	
 	reg [7:4]S_temp;
-	always @(IR) begin
-		
-		case (IR)
-			4'b0001: S_temp <= 4'b1001;
-			4'b0010: S_temp <= 4'b0110;
-			4'b0011: S_temp <= 4'b1011;
-			4'b0100: S_temp <= 4'b0000;
-			4'b0101: S_temp <= 4'b1010;
-			4'b0110: S_temp <= 4'b1010;
-			
-			4'b1001: S_temp <= 4'b1111;
-			default: S_temp <= 4'b1111;
-		endcase
-	
+	always @(IR or W) begin
+		if(W[2]) begin
+			case (IR)
+				4'b0001: S_temp <= 4'b1001;
+				4'b0010: S_temp <= 4'b0110;
+				4'b0011: S_temp <= 4'b1011;
+				4'b0100: S_temp <= 4'b0000;
+				4'b0101: S_temp <= 4'b1010;
+				4'b0110: S_temp <= 4'b1111;
+				
+				4'b1001: S_temp <= 4'b1111;
+				default: S_temp <= 4'b1111;
+			endcase
+		end
+		if(W[3]) begin
+			case (IR)
+				4'b0110: S_temp <= 4'b1010;
+				default: S_temp <= 4'b1111;
+			endcase
+		end
 	end
 	assign S = S_temp;
 
