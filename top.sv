@@ -74,6 +74,7 @@ module cpu (
         st0 <= 1'b0;
       end
       if (sst0 == 1'b1) begin
+        $display("sst0[%1b]", sst0);
         st0 <= 1'b1;
       end
     end else begin
@@ -106,6 +107,7 @@ module cpu (
   localparam rsto1 = 8'b00000010;
   localparam rsto2 = 8'b00000010;
   localparam pc = 8'b00000000;
+  localparam spc = 8'b00000001;
 
   assign lir = (w1 && (bool_func(
       ir, add
@@ -172,9 +174,9 @@ module cpu (
       union_ir, jmp
   ) || bool_func(
       union_ir, dec
-  ))) || w3 && bool_func(
+  ))) || (w3 && bool_func(
       union_ir, st
-  ));
+  )));
 
 
   assign s[2] = (w2 && (bool_func(
@@ -203,9 +205,9 @@ module cpu (
       union_ir, axor
   ) || bool_func(
       union_ir, dec
-  )) || (w3 && (bool_func(
+  ))) || (w3 && (bool_func(
       union_ir, st
-  )))));
+  ))));
 
   assign s[0] = (w2 && (bool_func(
       union_ir, add
@@ -353,7 +355,7 @@ module cpu (
 
   assign memw = (w1 && bool_func(union_ir, rsto2)) || (w3 && bool_func(union_ir, st));
 
-  assign arinc = (w1 && bool_func(union_ir, rsto2) || bool_func(union_ir, wsto2));
+  assign arinc = (w1 && (bool_func(union_ir, rsto2) || bool_func(union_ir, wsto2)));
 
   assign selctl = (w1 && (bool_func(
       union_ir, wreg1
@@ -425,7 +427,9 @@ module cpu (
       union_ir, rsto1
   ) || bool_func(
       union_ir, pc
-  ))) && (w2 && bool_func(
+  ) || bool_func(
+      union_ir, spc
+  ))) || (w2 && bool_func(
       union_ir, wreg1
   ));
 endmodule
