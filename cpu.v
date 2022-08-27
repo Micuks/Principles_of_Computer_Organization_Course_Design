@@ -68,9 +68,10 @@ module cpu(
 	end
 
 	// ST0次态逻辑
-	assign ST0_next = (write_reg && ST0 == 0 && W[2]) || ((read_mem || write_mem) && ST0 == 0 && W[1]) 
-	|| (write_reg && ST0 == 1 && W[1]) || (ins_fetch && ST0 == 0 && W[1]) || ((read_mem || write_mem) && ST0 && W[1])
-	|| (ins_fetch && (W[2] || W[3]));
+	assign ST0_next = (write_reg && !ST0 && W[2]) || (write_reg && ST0 && W[1]) 
+				|| (read_mem || write_mem)
+				|| (ins_fetch && !ST0 && W[1])
+				|| (ins_fetch && ST0);
 
 	// 控制台操作模式
 	assign write_reg = (SW == 3'b100 && !is_clr );
