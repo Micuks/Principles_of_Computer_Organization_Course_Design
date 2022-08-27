@@ -1,6 +1,6 @@
 <div align="center">
 
-# 2021 MCM Meritorious Article for Problem B :writing_hand:
+#计算机组成原理课程设计 :writing_hand:
 
 </div>
 
@@ -12,7 +12,7 @@
 
 </div>
 
-2022 Problem B.
+模板
 
 <div align="center">
 
@@ -20,9 +20,7 @@
 
 </div>
 
-The final article PDF is named with out `team control number`.
-
-[Click here](./2125028.pdf) to check the article.
+各章写在文件夹下的不同tex文件即可合并, 可以参考里面的latex语法
 
 <div align="center">
 
