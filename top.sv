@@ -44,7 +44,8 @@ module cpu (
     sel1,
     sel2,
     sel3,
-    input pulse
+    input pulse,
+    output dbg_led
 );
 
   reg st0;
@@ -693,5 +694,7 @@ module cpu (
   ))) | (w2 & bool_func(
       union_ir, wreg1
   ));
+
+  assign dbg_led = en_int;
 
 endmodule

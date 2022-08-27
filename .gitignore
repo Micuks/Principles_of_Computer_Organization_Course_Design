@@ -1,0 +1,8 @@
+*.mti
+*.mpf
+*.bak
+*.wlf
+*.vwf
+Output/*
+work/*
+docs/*
