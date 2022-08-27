@@ -278,7 +278,31 @@ module cpu (
 
   assign cin = (w2 && (bool_func(union_ir, add) || bool_func(union_ir, dec)));
 
-  assign abus = ((w1 && ((en_int && bool_func(
+  assign abus = ((w1 && (en_int && (bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jz
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
+  ) || bool_func(
       union_ir, spc
   )))) || (w2 && (bool_func(
       union_ir, add
@@ -304,15 +328,39 @@ module cpu (
       union_ir, iret
   ))));
 
-  assign drw = ((w1 && (bool_func(
+  assign drw = (w1 && (bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
-  )) || bool_func(
+  ) || bool_func(
       union_ir, pc
-  ) || (bool_func(
+  ) || (en_int && (bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jz
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
+  ) || bool_func(
       union_ir, spc
-  ) && en_int)) || (w2 && (bool_func(
+  ))))) || (w2 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -332,7 +380,7 @@ module cpu (
       union_ir, jmp
   ))) || (w3 && (bool_func(
       union_ir, ld
-  ))));
+  )));
 
   assign ldz = (w2 && (bool_func(
       union_ir, add
@@ -452,9 +500,33 @@ module cpu (
       union_ir, rsto2
   )) || bool_func(
       union_ir, pc
-  ) || (en_int && bool_func(
+  ) || (en_int && (bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jz
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
+  ) || bool_func(
       union_ir, spc
-  ))) || (w2 && (bool_func(
+  )))) || (w2 && (bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
@@ -498,9 +570,33 @@ module cpu (
       union_ir, wreg2
   ) || bool_func(
       union_ir, pc
-  )) || (bool_func(
+  )) || ((bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jz
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
+  ) || bool_func(
       union_ir, spc
-  ) && en_int)) || (w2 && (bool_func(
+  )) && en_int)) || (w2 && (bool_func(
       union_ir, wreg2
   ) || bool_func(
       union_ir, rreg
@@ -512,9 +608,33 @@ module cpu (
       union_ir, wreg1
   ))) || (w1 && bool_func(
       union_ir, pc
-  ) || (en_int && bool_func(
+  ) || (en_int && (bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jz
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
+  ) || bool_func(
       union_ir, spc
-  )));
+  ))));
 
   assign sel1 = (w1 && (bool_func(
       union_ir, wreg1
