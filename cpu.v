@@ -106,14 +106,14 @@ module cpu(
 	assign MBUS = (LD && W[2]) || (read_mem && ST0);
     // --------------------------
 	// 取指令
-	assign PCINC = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z))) 
+	assign PCINC = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z) || OUT || OR || CMP || MOV)) 
 					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP));
-	assign LIR = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z))) 
+	assign LIR = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z) || OUT || OR || CMP || MOV)) 
 					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP));
 	
 	// 节拍脉冲信号逻辑
 	assign SHORT = (read_mem || write_mem) || (ins_fetch && !ST0 && W[1])
-					|| (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z))) ;
+					|| (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z) || OUT || OR || CMP || MOV)) ;
 	assign LONG = 0;
 
 
