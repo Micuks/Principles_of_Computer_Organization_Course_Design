@@ -1,0 +1,24 @@
+# latex part
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.xml
+*.gz
+*.toc
+*.xdv
+*.Identifier
+
+# verilog part
+Output/*
+work/*
+*.mti
+*.tv
+*.mpf
+*.bak
+*.wlf
+*.vwf
