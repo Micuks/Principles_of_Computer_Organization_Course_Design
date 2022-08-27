@@ -1,10 +1,10 @@
 function bool_func;
 
-  input [7:0] ir;
-  input [7:0] sign;
+  input [8:0] ir;
+  input [8:0] sign;
 
   begin
-    bool_func = (ir[7:0] == sign[7:0]) ? 1'b1 : 1'b0;
+    bool_func = (ir[8:0] == sign[8:0]) ? 1'b1 : 1'b0;
   end
 endfunction
 
