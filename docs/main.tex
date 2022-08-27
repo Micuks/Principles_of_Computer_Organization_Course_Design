@@ -1,0 +1,56 @@
+\documentclass{mcmthesis}
+\mcmsetup{CTeX = true,   % 使用 CTeX 套装时，设置为 true
+        tcn = 2218285, problem = B,
+        sheet = true, titleinsheet = true, keywordsinsheet = true,
+        titlepage = false, abstract = false}
+\usepackage{newtxtext}%\usepackage{palatino}
+\usepackage{bm}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{multicol}
+\usepackage{pdfpages}
+\usepackage{xeCJK}
+% \usepackage{cite}
+\usepackage{indentfirst}
+\usepackage{biblatex}
+\addbibresource{reference/refs.bib}
+\setlength{\headheight}{13.6pt}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\renewcommand{\abstractname}{\large Summary}
+\title{\LARGE\textbf{中文标题}} %标题
+\begin{document}
+\begin{abstract}
+  \par
+  \begin{itemize}
+    \item \textbf{第一章}总体概述
+    \item \textbf{第二章}设计思路
+    \item \textbf{第三章}详细设计
+    \item \textbf{第四章}设计与调试过程
+    \item \textbf{第五章}实验总结与心得
+    \item \textbf{第六章}控制器源代码
+  \end{itemize}
+  \begin{keywords}
+    keyword 1, keyword 2, etc.
+  \end{keywords}
+\end{abstract}
+\maketitle
+\tableofcontents
+\pagebreak
+% 第一章
+\input{1.Introduction/index.tex}
+% 第二章
+\input{2.Assumptions/index.tex}
+% 第三章
+\input{3/index.tex}
+% 第四章
+\input{4.The Models/index.tex}
+% 第五章
+\input{5/index.tex}
+% 第六章
+\input{6/index.tex}
+% % 参考文献
+% \input{reference/index.tex}
+\addcontentsline{toc}{section}{References}
+\printbibliography
+\end{document}
