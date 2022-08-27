@@ -79,35 +79,44 @@ module cpu(
 	assign read_mem = (SW == 3'b010 && !is_clr) ;
 	assign ins_fetch = (SW == 3'b000 && !is_clr) ;
 
-	// 各操作信号产生逻辑
-	assign STOP = is_clr || (!ins_fetch) || (ins_fetch && STP && W[2]); //(!(ins_fetch && STP && W[2]) && !(W[1] && ins_fetch && ST0));
 	// 选择寄存器
 	assign SEL[0] = ((write_reg || read_reg) && W[1]) || (read_reg && W[2]) ;
 	assign SEL[1] = (write_reg && !ST0 && W[1]) || (W[2] && write_reg && ST0) || (read_reg && W[2] );
 	assign SEL[2] = (write_reg && W[2]);
 	assign SEL[3] = (write_reg && ST0 ) || (read_reg && W[2]) ;
+	
+	// 各操作信号产生逻辑
+	assign STOP = is_clr || (!ins_fetch) || (ins_fetch && STP && W[1]);
 
-	assign DRW = write_reg || ((ADD || SUB || AND || INC || OR || MOV) && W[2]) || (LD && W[3]);
+	assign DRW = write_reg || ((ADD || SUB || AND || INC || OR || MOV) && W[1]) || (LD && W[1]);
 	assign SBUS = write_reg || (ins_fetch && !ST0 && W[1]) || (read_mem && !ST0 && W[1]) || (write_mem && W[1]);
 	assign SELCTL = SW != 3'b000;
 
-	assign SHORT = (read_mem || write_mem) || (ins_fetch && !ST0 && W[1]);
-	assign LONG = (LD || ST) && W[2];
-
-	assign LPC = (ins_fetch && !ST0 && W[1]) || (JMP && W[2]);
-	assign PCINC = ins_fetch && ST0 && W[1];
-	assign PCADD = ((JC && C) || (JZ && Z)) && W[2];
-	assign LAR = ((LD || ST) && W[2] ) || ((read_mem||write_mem) && !ST0 && W[1]);
+	assign LPC = (ins_fetch && !ST0 && W[1]) || (JMP && W[1]);
+	assign PCADD = ((JC && C) || (JZ && Z)) && W[1];
+	assign LAR = ((LD || ST) && W[1] ) || ((read_mem||write_mem) && !ST0 && W[1]);
 	assign ARINC = (read_mem || write_mem) && ST0;
-	assign LIR = ins_fetch && W[1] && ST0;
-	assign LDZ = (ADD || SUB || AND || INC || OR || CMP) && W[2];
-	assign LDC = (ADD || SUB || INC || CMP) && W[2];
-	assign CIN = ADD && W[2];
-	assign M =  ((AND || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ST && W[3]);
-	assign MEMW = (ST && W[3]) || (write_mem && ST0 && W[1]);
-	assign ABUS = ((ADD  || SUB || AND || INC || LD || ST || JMP || OUT || OR || MOV) && W[2]) || (ST && W[3]);
-	assign MBUS = (LD && W[3]) || (read_mem && ST0);
+	assign LDZ = (ADD || SUB || AND || INC || OR || CMP) && W[1];
+	assign LDC = (ADD || SUB || INC || CMP) && W[1];
+	assign CIN = ADD && W[1];
+	assign M =  ((AND || LD || ST || JMP || OUT || OR || MOV) && W[1]) || (ST && W[2]);
+	assign MEMW = (ST && W[2]) || (write_mem && ST0 && W[1]);
+	assign ABUS = ((ADD  || SUB || AND || INC || LD || ST || JMP || OUT || OR || MOV) && W[1]) || (ST && W[2]);
+	assign MBUS = (LD && W[2]) || (read_mem && ST0);
+    // --------------------------
+	// 取指令
+	assign PCINC = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z))) 
+					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP));
+	assign LIR = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z))) 
+					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP));
 	
+	// 节拍脉冲信号逻辑
+	assign SHORT = (read_mem || write_mem) || (ins_fetch && !ST0 && W[1])
+					|| (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z))) ;
+	assign LONG = 0;
+
+
+
 	// 运算器模式
 	reg [7:4]S_temp;
 	always @(IR or W) begin
