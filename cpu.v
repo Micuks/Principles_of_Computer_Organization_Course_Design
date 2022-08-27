@@ -70,7 +70,7 @@ module cpu(
 	// ST0次态逻辑
 	assign ST0_next = (write_reg && !ST0 && W[2]) || (write_reg && ST0 && W[1]) 
 				|| (read_mem || write_mem)
-				|| (ins_fetch && !ST0 && W[1])
+				|| (ins_fetch && !ST0 && W[2])
 				|| (ins_fetch && ST0);
 
 	// 控制台操作模式
@@ -87,7 +87,7 @@ module cpu(
 	assign SEL[3] = (write_reg && ST0 ) || (read_reg && W[2]) ;
 	
 	// 各操作信号产生逻辑
-	assign STOP = is_clr || (!ins_fetch) || (ins_fetch && STP && W[1]);
+	assign STOP = is_clr || (!ins_fetch) || (STP && W[1]) || (ins_fetch && !ST0 && W1);
 
 	assign DRW = write_reg || ((ADD || SUB || AND || INC || OR || MOV) && W[1]) || (LD && W[1]);
 	assign SBUS = write_reg || (ins_fetch && !ST0 && W[1]) || (read_mem && !ST0 && W[1]) || (write_mem && W[1]);
@@ -107,9 +107,12 @@ module cpu(
     // --------------------------
 	// 取指令
 	assign PCINC = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z) || OUT || OR || CMP || MOV)) 
-					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP));
+					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP))
+					|| (ins_fetch && !ST0 && W[2]);
 	assign LIR = (ST0 && W[1] && (NOP || ADD || SUB || AND || INC || (JC && !C) || (JZ && !Z) || OUT || OR || CMP || MOV)) 
-					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP));
+					|| (ST0 && W[2] && (LD || ST || (JC && C) || (JZ && Z) || JMP))
+					|| (ins_fetch && !ST0 && W[2]);
+					
 	
 	// 节拍脉冲信号逻辑
 	assign SHORT = (read_mem || write_mem) || (ins_fetch && !ST0 && W[1])
