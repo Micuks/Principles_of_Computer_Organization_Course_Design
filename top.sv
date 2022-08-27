@@ -58,7 +58,6 @@ module cpu (
   wire intdi;  // let en_int = 0 when intdi == 1
   reg en_int;  // allow interrupt flag
   reg st1;  // interrupt stage flag
-  wire sst1;
 
   assign sw = {swc, swb, swa};
 
@@ -101,10 +100,10 @@ module cpu (
 
   // st0 sequential logic part
   always @(negedge clr, negedge t3) begin
-    if (!clr) begin
+    if (~clr) begin
       st0 <= 1'b0;
-    end else if (!t3) begin
-      if (st0 == 1'b1 && w2 == 1'b1 && sw == 3'b100) begin
+    end else if (~t3) begin
+      if (st0 == 1'b1 & w2 == 1'b1 & sw == 3'b100) begin
         st0 <= 1'b0;
       end
       if (sst0 == 1'b1) begin
@@ -119,13 +118,40 @@ module cpu (
 
   // st1 sequential logic part
   always @(negedge clr, negedge t3) begin  // pulse is unsure
-    if (!clr) begin
+    if (~clr) begin
       st1 <= 1'b0;
-    end else if (!t3) begin
-      if (sst1 == 1'b1) begin
+    end else if (~t3) begin
+      if (~st1 & int0 & ((w2 & (bool_func(
+              union_ir, spc  // spc == nop
+          ) | bool_func(
+              union_ir, add
+          ) | bool_func(
+              union_ir, sub
+          ) | bool_func(
+              union_ir, aand
+          ) | bool_func(
+              union_ir, inc
+          ) | bool_func(
+              union_ir, jc
+          ) | bool_func(
+              union_ir, jz
+          ) | bool_func(
+              union_ir, jc
+          ) | bool_func(
+              union_ir, jmp
+          ) | bool_func(
+              union_ir, axor
+          ) | bool_func(
+              union_ir, dec
+          ) | bool_func(
+              union_ir, stp
+          ))) | (w3 & (bool_func(
+              union_ir, ld
+          ) | bool_func(
+              union_ir, st
+          ))))) begin
         st1 <= 1'b1;
-      end
-      if (st1 && !int0 && w2) begin
+      end else if (st1 & ~int0 & w2) begin
         st1 <= 1'b0;
       end
     end else begin
@@ -135,10 +161,10 @@ module cpu (
 
   // en_int enable interrupt sequential logic part
   always @(negedge clr, negedge t3) begin
-    if (!clr) begin
+    if (~clr) begin
       en_int <= 1'b1;
-    end else if (!t3) begin
-      en_int <= (inten || (en_int && !intdi));
+    end else if (~t3) begin
+      en_int <= (inten | (en_int & ~intdi));
     end else begin
       en_int <= en_int;  // unpredicted corner case
     end
@@ -146,556 +172,526 @@ module cpu (
 
   // int0 interrupt flag
   always @(negedge clr, posedge pulse) begin
-    if (!clr) begin
+    if (~clr) begin
       int0 <= 1'b0;
-    end else if (en_int && pulse) begin
-      int0 <= 1'b1;
+    end else if (pulse) begin
+      int0 <= en_int;
     end else begin
-      int0 <= 1'b0;
+      int0 <= int0;
     end
   end
 
   // combinational logic part
-  assign intdi = st1 && w1;
+  assign intdi = st1 & w1;
 
-  assign inten = bool_func(union_ir, iret) && w2;
+  assign inten = bool_func(union_ir, iret) & w2;
 
-  assign lir = (w1 && (bool_func(
+  assign lir = (w1 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
   )));
 
-  assign pcinc = (w1 && (bool_func(
+  assign pcinc = (w1 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
   )));
 
 
-  assign s[3] = ((w2 && (bool_func(
+  assign s[3] = ((w2 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, iret
   ))));
 
 
-  assign s[2] = (w2 && (bool_func(
+  assign s[2] = (w2 & (bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
   )));
 
-  assign s[1] = ((w2 && (bool_func(
+  assign s[1] = ((w2 & (bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, iret
   ))));
 
-  assign s[0] = (w2 && (bool_func(
+  assign s[0] = (w2 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
   )));
 
-  assign cin = (w2 && (bool_func(union_ir, add) || bool_func(union_ir, dec)));
+  assign cin = (w2 & (bool_func(union_ir, add) | bool_func(union_ir, dec)));
 
-  assign abus = ((w1 && (en_int && (bool_func(
+  assign abus = ((w1 & (en_int & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
-  )))) || (w2 && (bool_func(
+  )))) | (w2 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, iret
   ))));
 
-  assign drw = (w1 && (bool_func(
+  assign drw = (w1 & (bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, pc
-  ) || (en_int && (bool_func(
+  ) | (en_int & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
-  ))))) || (w2 && (bool_func(
+  ))))) | (w2 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  )) || (en_int && bool_func(
+  )) | (en_int & bool_func(
       union_ir, jmp
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, ld
   )));
 
-  assign ldz = (w2 && (bool_func(
+  assign ldz = (w2 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
   )));
 
-  assign ldc = (w2 && (bool_func(
+  assign ldc = (w2 & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
   )));
   //   $display("w2[%1b] ldc[%1b] union_ir[%4b] b_f(sub)[%1b]", w2, ldc, union_ir, bool_func(union_ir, sub));
 
-  assign m = ((w2 && (bool_func(
+  assign m = ((w2 & (bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, iret
   ))));
   //   $display("w2[%1b] m[%1b] union_ir[%4b] b_f(sub)[%1b]", w2, m, union_ir, bool_func(union_ir, sub));
 
-  assign lar = (w1 && (bool_func(
+  assign lar = (w1 & (bool_func(
       union_ir, wsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto1
-  ))) || (w2 && (bool_func(
+  ))) | (w2 & (bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
   )));
 
-  assign long = (w2 && (bool_func(
+  assign long = (w2 & (bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, iret
   )));
 
-  assign pcadd = w2 && ((bool_func(union_ir, jc) && c) || (bool_func(union_ir, jz) && z));
+  assign pcadd = w2 & ((bool_func(union_ir, jc) & c) | (bool_func(union_ir, jz) & z));
 
-  assign lpc = (w1 && bool_func(
+  assign lpc = (w1 & bool_func(
       union_ir, pc
-  )) || (w2 && (bool_func(
+  )) | (w2 & (bool_func(
       union_ir, jmp
-  ) || st1)) || (w3 && bool_func(
+  ) | st1)) | (w3 & bool_func(
       union_ir, iret
   ));
 
-  assign stop = (w1 && (bool_func(
+  assign stop = (w1 & (bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wsto2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, pc
-  ) || st1)) || (w2 && (bool_func(
+  ) | st1)) | (w2 & (bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
   )));
 
-  assign mbus = (w1 && bool_func(union_ir, rsto2)) || (w3 && bool_func(union_ir, ld));
+  assign mbus = (w1 & bool_func(union_ir, rsto2)) | (w3 & bool_func(union_ir, ld));
 
-  assign memw = (w1 && bool_func(union_ir, wsto2)) || (w3 && bool_func(union_ir, st));
+  assign memw = (w1 & bool_func(union_ir, wsto2)) | (w3 & bool_func(union_ir, st));
 
-  assign arinc = (w1 && (bool_func(union_ir, rsto2) || bool_func(union_ir, wsto2)));
+  assign arinc = (w1 & (bool_func(union_ir, rsto2) | bool_func(union_ir, wsto2)));
 
-  assign selctl = (w1 && (bool_func(
+  assign selctl = (w1 & (bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wsto2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto2
-  )) || bool_func(
+  ) | bool_func(
       union_ir, pc
-  ) || (en_int && (bool_func(
+  ) | (en_int & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
-  )))) || (w2 && (bool_func(
+  ))))) | (w2 & (bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, iret
   )));
 
-  assign sbus = (w1 && (bool_func(
+  assign sbus = (w1 & (bool_func(
       union_ir, wsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wsto2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, pc
-  ))) || (w2 && (bool_func(
+  ))) | (w2 & (bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ))) || (st1 && w2);
+  ))) | (st1 & w2);
 
-  assign short = (w1 && (bool_func(
+  assign short = (w1 & (bool_func(
       union_ir, wsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wsto2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, pc
   )));
 
-  assign sel3 = (w1 && (bool_func(
+  assign sel3 = (w1 & (bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, pc
-  )) || ((bool_func(
+  )) | ((bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
-  )) && en_int)) || (w2 && (bool_func(
+  )) & en_int)) | (w2 & (bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
   )));
 
-  assign sel2 = (w2 && (bool_func(
+  assign sel2 = (w2 & (bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg1
-  ))) || (w1 && bool_func(
+  ))) | (w1 & bool_func(
       union_ir, pc
-  ) || (en_int && (bool_func(
+  ) | (en_int & (bool_func(
       union_ir, add
-  ) || bool_func(
+  ) | bool_func(
       union_ir, sub
-  ) || bool_func(
+  ) | bool_func(
       union_ir, aand
-  ) || bool_func(
+  ) | bool_func(
       union_ir, inc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, ld
-  ) || bool_func(
+  ) | bool_func(
       union_ir, st
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jc
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jz
-  ) || bool_func(
+  ) | bool_func(
       union_ir, jmp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, axor
-  ) || bool_func(
+  ) | bool_func(
       union_ir, dec
-  ) || bool_func(
+  ) | bool_func(
       union_ir, stp
-  ) || bool_func(
+  ) | bool_func(
       union_ir, spc
   ))));
 
-  assign sel1 = (w1 && (bool_func(
+  assign sel1 = (w1 & (bool_func(
       union_ir, wreg1
-  ))) || (w2 && (bool_func(
+  ))) | (w2 & (bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, iret
   )));
 
-  assign sel0 = (w1 && (bool_func(
+  assign sel0 = (w1 & (bool_func(
       union_ir, wreg1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, wreg2
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rreg
-  ))) || (w2 && (bool_func(
+  ))) | (w2 & (bool_func(
       union_ir, rreg
-  ))) || (w3 && (bool_func(
+  ))) | (w3 & (bool_func(
       union_ir, iret
   )));
 
-  assign sst0 = (w1 && (bool_func(
+  assign sst0 = (w1 & (bool_func(
       union_ir, wsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, rsto1
-  ) || bool_func(
+  ) | bool_func(
       union_ir, pc
-  ))) || (w2 && bool_func(
+  ))) | (w2 & bool_func(
       union_ir, wreg1
   ));
-
-  assign sst1 = ((!st1 && int0 && ((w2 && (bool_func(
-      union_ir, spc  // spc == nop
-  ) || bool_func(
-      union_ir, add
-  ) || bool_func(
-      union_ir, sub
-  ) || bool_func(
-      union_ir, aand
-  ) || bool_func(
-      union_ir, inc
-  ) || bool_func(
-      union_ir, jc
-  ) || bool_func(
-      union_ir, jz
-  ) || bool_func(
-      union_ir, jc
-  ) || bool_func(
-      union_ir, jmp
-  ) || bool_func(
-      union_ir, axor
-  ) || bool_func(
-      union_ir, dec
-  ) || bool_func(
-      union_ir, stp
-  ))) || (w3 && (bool_func(
-      union_ir, ld
-  ) || bool_func(
-      union_ir, st
-  ))))));
 
 endmodule
