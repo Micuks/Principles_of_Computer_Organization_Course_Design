@@ -48,7 +48,7 @@ module cpu (
 );
 
   reg st0;
-  reg sst0;
+  wire sst0;
   wire [2:0] sw;
   wire [8:0] union_ir;  // {ir[7:4], sw[2:0], st0, st1}
 
@@ -58,7 +58,7 @@ module cpu (
   wire intdi;  // let en_int = 0 when intdi == 1
   reg en_int;  // allow interrupt flag
   reg st1;  // interrupt stage flag
-//   reg sst1;
+  wire sst1;
 
   assign sw = {swc, swb, swa};
 
@@ -118,44 +118,15 @@ module cpu (
   end
 
   // st1 sequential logic part
-  always @(negedge clr, negedge t3, negedge pulse) begin  // pulse is unsure
+  always @(negedge clr, negedge t3) begin  // pulse is unsure
     if (!clr) begin
       st1 <= 1'b0;
     end else if (!t3) begin
-      if (!st1 && int0 && ((w2 && (bool_func(
-              union_ir, spc  // spc == nop
-          ) || bool_func(
-              union_ir, add
-          ) || bool_func(
-              union_ir, sub
-          ) || bool_func(
-              union_ir, aand
-          ) || bool_func(
-              union_ir, inc
-          ) || bool_func(
-              union_ir, jc
-          ) || bool_func(
-              union_ir, jz
-          ) || bool_func(
-              union_ir, jc
-          ) || bool_func(
-              union_ir, jmp
-          ) || bool_func(
-              union_ir, axor
-          ) || bool_func(
-              union_ir, dec
-          ) || bool_func(
-              union_ir, stp
-          ))) || (w3 && (bool_func(
-              union_ir, ld
-          ) || bool_func(
-              union_ir, st
-          ))))) begin
+      if (sst1 == 1'b1) begin
         st1 <= 1'b1;
-      end else if (st1 && !int0 && w2) begin
+      end
+      if (st1 && !int0 && w2) begin
         st1 <= 1'b0;
-      end else begin
-        st1 <= st1;
       end
     end else begin
       st1 <= st1;
@@ -576,4 +547,35 @@ module cpu (
   ))) || (w2 && bool_func(
       union_ir, wreg1
   ));
+
+  assign sst1 = ((!st1 && int0 && ((w2 && (bool_func(
+      union_ir, spc  // spc == nop
+  ) || bool_func(
+      union_ir, add
+  ) || bool_func(
+      union_ir, sub
+  ) || bool_func(
+      union_ir, aand
+  ) || bool_func(
+      union_ir, inc
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jz
+  ) || bool_func(
+      union_ir, jc
+  ) || bool_func(
+      union_ir, jmp
+  ) || bool_func(
+      union_ir, axor
+  ) || bool_func(
+      union_ir, dec
+  ) || bool_func(
+      union_ir, stp
+  ))) || (w3 && (bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ))))));
+
 endmodule
