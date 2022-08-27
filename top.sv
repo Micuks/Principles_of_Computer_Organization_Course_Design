@@ -108,13 +108,13 @@ module cpu (
         st0 <= 1'b0;
       end
       if (sst0 == 1'b1) begin
-        $display("sst0[%1b]", sst0);
+        // $display("sst0[%1b]", sst0);
         st0 <= 1'b1;
       end
     end else begin
       st0 <= st0;
     end
-    $display("st0[%1b]", st0);
+    // $display("st0[%1b]", st0);
   end
 
   // st1 sequential logic part
@@ -158,6 +158,7 @@ module cpu (
     end else begin
       st1 <= st1;
     end
+    $display("st1[%1b]", st1);
   end
 
   // en_int enable interrupt sequential logic part
@@ -169,16 +170,19 @@ module cpu (
     end else begin
       en_int <= en_int;  // unpredicted corner case
     end
+    $display("en_int[%1b]", en_int);
   end
 
   // int0 interrupt flag
-  always @(negedge clr, posedge pulse) begin
+  always @(negedge clr, posedge pulse, negedge en_int) begin
     if (~clr) begin
       int0 <= 1'b0;
-    end else if (pulse) begin
+    end
+    if (pulse) begin
       int0 <= en_int;
-    end else begin
-      int0 <= int0;
+    end
+    if (!en_int) begin
+      int0 <= 1'b0;
     end
   end
 

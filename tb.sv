@@ -3,7 +3,7 @@
 
 module cpu_tb;
   `include "top.sv"
-  reg [7:0] ir;
+  reg [7:4] ir;
   reg [3:0] s;
   reg
       clr,
@@ -38,7 +38,9 @@ module cpu_tb;
       sel0,
       sel1,
       sel2,
-      sel3;
+      sel3,
+      pulse,
+      dbg_led;
 
   localparam period = 200;
 
@@ -77,7 +79,9 @@ module cpu_tb;
       .sel0(sel0),
       .sel1(sel1),
       .sel2(sel2),
-      .sel3(sel3)
+      .sel3(sel3),
+      .pulse(pulse),
+      .dbg_led(dbg_led)
   );
   initial begin
     clr = 0;
@@ -122,14 +126,21 @@ module cpu_tb;
     end
   end
 
+  // initial begin
+  //   pulse = 0;
+  //   #period;
+  //   pulse = 1;
+  //   #5 pulse = 0;
+  // end
+
   // begin simulate
   initial begin
     $display("begin simulation");
     swa = 0;
     swb = 0;
     swc = 0;
-    ir  = 8'b00010000;
-    $display("ir[%8b]", ir);
+    ir  = 4'b0010;
+    $display("ir[%4b]", ir);
     #period;
     $finish;
 
