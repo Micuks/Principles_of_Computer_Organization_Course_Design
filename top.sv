@@ -58,6 +58,7 @@ module cpu (
   wire intdi;  // let en_int = 0 when intdi == 1
   reg en_int;  // allow interrupt flag
   reg st1;  // interrupt stage flag
+//   reg sst1;
 
   assign sw = {swc, swb, swa};
 
@@ -144,7 +145,7 @@ module cpu (
           ) || bool_func(
               union_ir, dec
           ) || bool_func(
-              stp
+              union_ir, stp
           ))) || (w3 && (bool_func(
               union_ir, ld
           ) || bool_func(
@@ -153,7 +154,11 @@ module cpu (
         st1 <= 1'b1;
       end else if (st1 && !int0 && w2) begin
         st1 <= 1'b0;
+      end else begin
+        st1 <= st1;
       end
+    end else begin
+      st1 <= st1;
     end
   end
 
@@ -169,7 +174,7 @@ module cpu (
   end
 
   // int0 interrupt flag
-  always @(negedge clr, negedge en_int, posedge pulse) begin
+  always @(negedge clr, posedge pulse) begin
     if (!clr) begin
       int0 <= 1'b0;
     end else if (en_int && pulse) begin
