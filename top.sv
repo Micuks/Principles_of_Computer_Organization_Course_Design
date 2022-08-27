@@ -33,8 +33,8 @@ module cpu (
     ldz,
     ldc,
     cin,
-    output reg [3:0] s,
-    output reg m,
+    output [3:0] s,
+    output m,
     abus,
     sbus,
     mbus,
@@ -43,19 +43,62 @@ module cpu (
     sel0,
     sel1,
     sel2,
-    sel3
+    sel3,
+    input pulse
 );
 
-  // `include "pick_ir.sv"
   reg st0;
   reg sst0;
   wire [2:0] sw;
-  wire [7:0] union_ir;
+  wire [8:0] union_ir;  // {ir[7:4], sw[2:0], st0, st1}
+
+  // interrupt part
+  reg int0;  // interrupt flag
+  wire inten;  // let en_int = 1 when inten == 1
+  wire intdi;  // let en_int = 0 when intdi == 1
+  reg en_int;  // allow interrupt flag
+  reg st1;  // interrupt stage flag
 
   assign sw = {swc, swb, swa};
 
-  assign union_ir = {ir[7:4], sw[2:0], st0};
+  assign union_ir = {ir[7:4], sw[2:0], st0, st1};
 
+  // instruction name and ir {ir[7:4], sw[2:0], st0, st1}
+  // interrupt instructions
+  localparam iret = 9'b111100010;
+
+  // pc modifier instructions
+  localparam pc = 9'b000000000;
+  localparam spc = 9'b000000010;  // equals to nop instruction
+  localparam nop = 9'b000000010;  // equals to spc instruction
+
+  // basic instructions
+  localparam add = 9'b000100010;
+  localparam sub = 9'b001000010;
+  localparam aand = 9'b001100010;
+  localparam inc = 9'b010000010;
+  localparam ld = 9'b010100010;
+  localparam st = 9'b011000010;
+  localparam jc = 9'b011100010;
+  localparam jz = 9'b100000010;
+  localparam jmp = 9'b100100010;
+
+  // added instructions
+  localparam axor = 9'b101000010;
+  localparam dec = 9'b101100010;
+  localparam stp = 9'b111000010;
+
+  // register ans storage instructions
+  localparam wreg1 = 9'b000010000;
+  localparam wreg2 = 9'b000010010;
+  localparam rreg = 9'b000001100;
+  localparam rsto1 = 9'b000001000;
+  localparam rsto2 = 9'b000001010;
+  localparam wsto1 = 9'b000000100;
+  localparam wsto2 = 9'b000000110;
+
+
+  // st0 sequential logic part
   always @(negedge clr, negedge t3) begin
     if (!clr) begin
       st0 <= 1'b0;
@@ -71,33 +114,75 @@ module cpu (
       st0 <= st0;
     end
     $display("st0[%1b]", st0);
-    // pick_ir_st0_1({ir, sw, st0}, lir, pcinc, s, cin, abus, drw, ldz, ldc, m, lar, long, arinc, sbus,
-    //               short, sel3, sel2, sel1, sel0, selctl, sst0, c, pcadd, z, lpc, stop, mbus, memw,
-    //               w1, w2, w3);
   end
 
-  // instruction name and ir
-  localparam add = 8'b00010001;
-  localparam sub = 8'b00100001;
-  localparam aand = 8'b00110001;
-  localparam inc = 8'b01000001;
-  localparam ld = 8'b01010001;
-  localparam st = 8'b01100001;
-  localparam jc = 8'b01110001;
-  localparam jz = 8'b10000001;
-  localparam jmp = 8'b10010001;
-  localparam axor = 8'b10100001;
-  localparam dec = 8'b10110001;
-  localparam stp = 8'b11100001;
-  localparam wreg1 = 8'b00001000;
-  localparam wreg2 = 8'b00001001;
-  localparam rreg = 8'b00000110;
-  localparam rsto1 = 8'b00000100;
-  localparam rsto2 = 8'b00000101;
-  localparam wsto1 = 8'b00000010;
-  localparam wsto2 = 8'b00000011;
-  localparam pc = 8'b00000000;
-  localparam spc = 8'b00000001;
+  // st1 sequential logic part
+  always @(negedge clr, negedge t3, negedge pulse) begin  // pulse is unsure
+    if (!clr) begin
+      st1 <= 1'b0;
+    end else if (!t3) begin
+      if (!st1 && int0 && ((w2 && (bool_func(
+              union_ir, spc  // spc == nop
+          ) || bool_func(
+              union_ir, add
+          ) || bool_func(
+              union_ir, sub
+          ) || bool_func(
+              union_ir, aand
+          ) || bool_func(
+              union_ir, inc
+          ) || bool_func(
+              union_ir, jc
+          ) || bool_func(
+              union_ir, jz
+          ) || bool_func(
+              union_ir, jc
+          ) || bool_func(
+              union_ir, jmp
+          ) || bool_func(
+              union_ir, axor
+          ) || bool_func(
+              union_ir, dec
+          ) || bool_func(
+              stp
+          ))) || (w3 && (bool_func(
+              union_ir, ld
+          ) || bool_func(
+              union_ir, st
+          ))))) begin
+        st1 <= 1'b1;
+      end else if (st1 && !int0 && w2) begin
+        st1 <= 1'b0;
+      end
+    end
+  end
+
+  // en_int enable interrupt sequential logic part
+  always @(negedge clr, negedge t3) begin
+    if (!clr) begin
+      en_int <= 1'b1;
+    end else if (!t3) begin
+      en_int <= (inten || (en_int && !intdi));
+    end else begin
+      en_int <= en_int;  // unpredicted corner case
+    end
+  end
+
+  // int0 interrupt flag
+  always @(negedge clr, negedge en_int, posedge pulse) begin
+    if (!clr) begin
+      int0 <= 1'b0;
+    end else if (en_int && pulse) begin
+      int0 <= 1'b1;
+    end else begin
+      int0 <= 1'b0;
+    end
+  end
+
+  // combinational logic part
+  assign intdi = st1 && w1;
+
+  assign inten = bool_func(union_ir, iret) && w2;
 
   assign lir = (w1 && (bool_func(
       union_ir, add
@@ -168,17 +253,17 @@ module cpu (
       union_ir, jmp
   ) || bool_func(
       union_ir, dec
-  ))) || (w3 && bool_func(
+  ))) || (w3 && (bool_func(
       union_ir, st
-  )));
+  ) || bool_func(
+      union_ir, iret
+  ))));
 
 
   assign s[2] = (w2 && (bool_func(
       union_ir, sub
   ) || bool_func(
       union_ir, st
-  ) || bool_func(
-      union_ir, jmp
   ) || bool_func(
       union_ir, axor
   ) || bool_func(
@@ -201,6 +286,8 @@ module cpu (
       union_ir, dec
   ))) || (w3 && (bool_func(
       union_ir, st
+  ) || bool_func(
+      union_ir, iret
   ))));
 
   assign s[0] = (w2 && (bool_func(
@@ -210,14 +297,14 @@ module cpu (
   ) || bool_func(
       union_ir, st
   ) || bool_func(
-      union_ir, jmp
-  ) || bool_func(
       union_ir, dec
   )));
 
   assign cin = (w2 && (bool_func(union_ir, add) || bool_func(union_ir, dec)));
 
-  assign abus = ((w2 && (bool_func(
+  assign abus = ((w1 && ((en_int && bool_func(
+      union_ir, spc
+  )))) || (w2 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -237,13 +324,19 @@ module cpu (
       union_ir, dec
   ))) || (w3 && (bool_func(
       union_ir, st
+  ) || bool_func(
+      union_ir, iret
   ))));
 
   assign drw = ((w1 && (bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
-  ))) || (w2 && (bool_func(
+  )) || bool_func(
+      union_ir, pc
+  ) || (bool_func(
+      union_ir, spc
+  ) && en_int)) || (w2 && (bool_func(
       union_ir, add
   ) || bool_func(
       union_ir, sub
@@ -259,6 +352,8 @@ module cpu (
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
+  )) || (en_int && bool_func(
+      union_ir, jmp
   ))) || (w3 && (bool_func(
       union_ir, ld
   ))));
@@ -300,6 +395,8 @@ module cpu (
       union_ir, axor
   ))) || (w3 && (bool_func(
       union_ir, st
+  ) || bool_func(
+      union_ir, iret
   ))));
   //   $display("w2[%1b] m[%1b] union_ir[%4b] b_f(sub)[%1b]", w2, m, union_ir, bool_func(union_ir, sub));
 
@@ -313,11 +410,23 @@ module cpu (
       union_ir, st
   )));
 
-  assign long = (w2 && (bool_func(union_ir, ld) || bool_func(union_ir, st)));
+  assign long = (w2 && (bool_func(
+      union_ir, ld
+  ) || bool_func(
+      union_ir, st
+  ) || bool_func(
+      union_ir, iret
+  )));
 
   assign pcadd = w2 && ((bool_func(union_ir, jc) && c) || (bool_func(union_ir, jz) && z));
 
-  assign lpc = (w1 && bool_func(union_ir, pc)) || (w2 && bool_func(union_ir, jmp));
+  assign lpc = (w1 && bool_func(
+      union_ir, pc
+  )) || (w2 && (bool_func(
+      union_ir, jmp
+  ) || st1)) || (w3 && bool_func(
+      union_ir, iret
+  ));
 
   assign stop = (w1 && (bool_func(
       union_ir, wreg1
@@ -335,7 +444,7 @@ module cpu (
       union_ir, rsto2
   ) || bool_func(
       union_ir, pc
-  ))) || (w2 && (bool_func(
+  ) || st1)) || (w2 && (bool_func(
       union_ir, stp
   ) || bool_func(
       union_ir, wreg1
@@ -365,12 +474,18 @@ module cpu (
       union_ir, rsto1
   ) || bool_func(
       union_ir, rsto2
+  )) || bool_func(
+      union_ir, pc
+  ) || (en_int && bool_func(
+      union_ir, spc
   ))) || (w2 && (bool_func(
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
   ) || bool_func(
       union_ir, rreg
+  ))) || (w3 && (bool_func(
+      union_ir, iret
   )));
 
   assign sbus = (w1 && (bool_func(
@@ -389,7 +504,7 @@ module cpu (
       union_ir, wreg1
   ) || bool_func(
       union_ir, wreg2
-  )));
+  ))) || (st1 && w2);
 
   assign short = (w1 && (bool_func(
       union_ir, wsto1
@@ -405,13 +520,25 @@ module cpu (
 
   assign sel3 = (w1 && (bool_func(
       union_ir, wreg2
-  ))) || (w2 && (bool_func(
+  ) || bool_func(
+      union_ir, pc
+  )) || (bool_func(
+      union_ir, spc
+  ) && en_int)) || (w2 && (bool_func(
       union_ir, wreg2
   ) || bool_func(
       union_ir, rreg
   )));
 
-  assign sel2 = (w2 && (bool_func(union_ir, wreg2) || bool_func(union_ir, wreg1)));
+  assign sel2 = (w2 && (bool_func(
+      union_ir, wreg2
+  ) || bool_func(
+      union_ir, wreg1
+  ))) || (w1 && bool_func(
+      union_ir, pc
+  ) || (en_int && bool_func(
+      union_ir, spc
+  )));
 
   assign sel1 = (w1 && (bool_func(
       union_ir, wreg1
@@ -419,6 +546,8 @@ module cpu (
       union_ir, wreg2
   ) || bool_func(
       union_ir, rreg
+  ))) || (w3 && (bool_func(
+      union_ir, iret
   )));
 
   assign sel0 = (w1 && (bool_func(
@@ -429,6 +558,8 @@ module cpu (
       union_ir, rreg
   ))) || (w2 && (bool_func(
       union_ir, rreg
+  ))) || (w3 && (bool_func(
+      union_ir, iret
   )));
 
   assign sst0 = (w1 && (bool_func(
