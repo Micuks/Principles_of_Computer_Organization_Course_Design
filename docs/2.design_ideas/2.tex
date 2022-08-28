@@ -1,7 +1,10 @@
 \subsection{控制器的时序系统}
-\tec 的时序发生器由2片GAL22V10组成，产生节拍脉冲T1\comma T2\comma T3，节拍电位W1\comma W2\comma W3。T1、T2、T3的脉冲宽度为$1\mu s$，一个机器周期包含一组T1、T2、T3。
+\tec 的时序发生器由2片GAL22V10组成，产生节拍脉冲T1\comma T2\comma T3，
+节拍电位W1\comma W2\comma W3。T1、T2、T3的脉冲宽度为$1\mu s$，
+一个机器周期包含一组T1、T2、T3。
 \par
-在我们设计的指令集中，不包含仅单机器周期的指令，所有指令均为二周期，三周期或四周期，均在t3下降沿改变信号。
+在我们设计的指令集中，不包含仅单机器周期的指令，所有指令均为二周期，三周期或四周期，
+均在t3下降沿改变信号。
 \begin{figure}[htbp]
     \label{clock}
     \fixedgraphic{figures/clock.png}

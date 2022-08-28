@@ -110,8 +110,9 @@
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{\small\sffamily \reportname}
-\rhead{\small\sffamily Page \thepage\ of \pageref{LastPage}}
+\rhead{\small\sffamily 第 \thepage\ 页，共 \pageref{LastPage} 页}
 \setlength\parskip{.5\baselineskip}
+\renewcommand{\contentsname}{目\: 录}
 \renewcommand\tableofcontents{%
     \centerline{\normalfont\Large\bfseries\sffamily\contentsname
         \@mkboth{%
