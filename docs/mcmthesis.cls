@@ -126,8 +126,8 @@
 \renewcommand{\topfraction}{0.85}
 \renewcommand{\bottomfraction}{0.65}
 \renewcommand{\floatpagefraction}{0.60}
-\renewcommand{\figurename}{Figure}
-\renewcommand{\tablename}{Table}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
 \graphicspath{{./}{./img/}{./fig/}{./image/}{./figure/}{./picture/}
             {./imgs/}{./figs/}{./images/}{./figures/}{./pictures/}}
 \def\maketitle{%
