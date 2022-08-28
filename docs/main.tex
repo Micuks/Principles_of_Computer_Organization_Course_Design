@@ -10,13 +10,20 @@
 \usepackage{multicol}
 \usepackage{pdfpages}
 \usepackage{xeCJK}
+\usepackage{graphicx}
 % \usepackage{cite}
 \usepackage{indentfirst}
 \usepackage{biblatex}
-\addbibresource{reference/refs.bib}
+% \addbibresource{reference/refs.bib}
 \setlength{\headheight}{13.6pt}
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
+
+\newcommand{\tec}{TEC-8实验系统}
+\newcommand{\wave}{\char`\~}
+\newcommand{\comma}{\char`\、}
+\newcommand{\fixedgraphic}[1]{\includegraphics[width=0.9\textwidth]{#1}}
+
 \renewcommand{\abstractname}{\large Summary}
 \title{\LARGE\textbf{中文标题}} %标题
 \begin{document}
@@ -51,6 +58,6 @@
 \input{6.controller_source_code/index.tex}
 % % 参考文献
 % \input{reference/index.tex}
-\addcontentsline{toc}{section}{References}
-\printbibliography
+% \addcontentsline{toc}{section}{References}
+% \printbibliography
 \end{document}
