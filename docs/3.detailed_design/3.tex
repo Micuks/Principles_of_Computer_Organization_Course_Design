@@ -90,5 +90,18 @@
 \subsubsection{中断处理流程}
 中断处理的流程如\ref{interrupt_control_flow}所示。
 \begin{itemize}
-    \item 在中断允许标志位EN\_INT为1时，R3和PC保持同步变化。
+    \item[$\diamond$ \textbf{R3作为PC的镜像}] 在中断允许标志位EN\_INT为1时，R3和PC保持同步变化。
+        在取指令的时候，R3随PCINC同步自增。当JMP指令执行的时候，由于IR3\wave IR2已经规定为11，所以DRW
+        置1即可同步将寄存器的值写入R3。
+    \item[$\diamond$ \textbf{中断处理}] 按下CLR后，中断允许标志位en\_int置1，此时可以接受pulse
+        信号使int0置1，从而进入中断。在每一个t3的下降沿，根据目前intdi和inten的状态来设置en\_int的值；对于intdi，只在st1 == 1且w1
+        时期置1，inten只在IRET指令且w2周期时置1。因此，在IRET的w3时期就可以继续接受中断请求。此外，
+        在双周期指令的w2和三周期指令的w3阶段，如果int0为1，则置st1 = 1，进入中断处理周期。
+        \par
+        在中断处理周期的w1，中断屏蔽位intdi置1，stop置1暂停程序，在t3下降沿置en\_int为0，int0为0。
+        在w2的t3下降沿中写入PC的值时，置st1位0，标识中断处理周期结束，进入中断子程序。
+        \par
+        在中断子程序中，en\_int为0，R3将不与PC同步变化，直到读到IRET指令，在w2时期置inten为1，使en\_int
+        在t3下降沿置1，标识可以再次进入中断。在w3时期将R3保存的进入中断时PC值赋给PC，退出中断，
+        恢复断点，中断处理结束。
 \end{itemize}
