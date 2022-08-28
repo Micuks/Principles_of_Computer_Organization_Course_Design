@@ -392,7 +392,7 @@ module cpu (
       union_ir, stp
   ) | bool_func(
       union_ir, spc
-  ))))) | (w2 & (bool_func(
+  ))))) | (w2 & ((bool_func(
       union_ir, add
   ) | bool_func(
       union_ir, sub
@@ -410,7 +410,7 @@ module cpu (
       union_ir, wreg2
   )) | (en_int & bool_func(
       union_ir, jmp
-  ))) | (w3 & (bool_func(
+  )))) | (w3 & (bool_func(
       union_ir, ld
   )));
 
@@ -598,7 +598,7 @@ module cpu (
       union_ir, pc
   )));
 
-  assign sel3 = (w1 & (bool_func(
+  assign sel3 = (w1 & ((bool_func(
       union_ir, wreg2
   ) | bool_func(
       union_ir, pc
@@ -628,7 +628,7 @@ module cpu (
       union_ir, stp
   ) | bool_func(
       union_ir, spc
-  )) & en_int)) | (w2 & (bool_func(
+  )) & en_int))) | (w2 & (bool_func(
       union_ir, wreg2
   ) | bool_func(
       union_ir, rreg
@@ -638,7 +638,7 @@ module cpu (
       union_ir, wreg2
   ) | bool_func(
       union_ir, wreg1
-  ))) | (w1 & bool_func(
+  ))) | (w1 & (bool_func(
       union_ir, pc
   ) | (en_int & (bool_func(
       union_ir, add
@@ -666,7 +666,7 @@ module cpu (
       union_ir, stp
   ) | bool_func(
       union_ir, spc
-  ))));
+  )))));
 
   assign sel1 = (w1 & (bool_func(
       union_ir, wreg1
