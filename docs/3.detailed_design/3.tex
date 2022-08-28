@@ -7,7 +7,7 @@
 即使发生 中断请求，\tec 也不响应中断请求。EI指令称作开中断指令，此条指令执行后，
 \tec 响应中断。 在时序发生器中，设置了一个允许中断触发器EN\_INT，当它为1时，
 允许中断； 当它为0时，禁止中断发生。 复位脉冲CLR\#使EN\_INT复位为0。
-\begin{figure}[H]
+\begin{figure}[htbp]
     \label{tec8graph}
     \includegraphics[width=\textwidth]{figures/chapter3/tec8.png}
     \caption{\tec 模型计算机框图}
@@ -54,7 +54,7 @@
     \item[$\diamond$ \textbf{pulse}] \tec 的pulse信号，是按下pulse按钮产生的高电平有效
         的中断请求脉冲信号。
 \end{itemize}
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \label{interrupt_control_flow}
     \includegraphics[width=\textwidth]{figures/chapter3/interrupt_control_flow.drawio.png}
@@ -62,11 +62,11 @@
 \end{figure}
 为了实现中断功能，对其他部分指令进行了改动。
 \begin{itemize}
-    \item 新增IRET指令如\ref{interrupt_instruction_table}，用于中断服务程序返回，在它的W2阶段开中断，W3阶段将R3的值
+    \item 新增IRET指令如表\ref{interrupt_instruction_table}，用于中断服务程序返回，在它的W2阶段开中断，W3阶段将R3的值
           赋给PC。
     \item 因为R3作为了PC的镜像，服务于中断返回，所以对其他指令屏蔽R3。
     \item 对JMP指令，由于在将寄存器的值赋给PC之外还要同步赋给R3，所以对JMP指令的格式
-          和微指令进行改动如\ref{interrupt_instruction_table}。
+          和微指令进行改动如表\ref{interrupt_instruction_table}。
     \item 由于JC和JZ指令的低四位表示offset，占用了表示R3的位，导致无法让R3与PC
           同步变化。经过考虑后，认为可以通过增加新标志位st2，在st2 = 1的时候从存储器
           左端口读出offset到数据总线，再加到R3的值实现，并恢复st2 = 0。但是由于时间限制，
@@ -88,7 +88,7 @@
     \caption{为实现中断对指令的改动}
 \end{table}
 \subsubsection{中断处理流程}
-中断处理的流程如\ref{interrupt_control_flow}所示。
+中断处理的流程如图\ref{interrupt_control_flow}所示。
 \begin{itemize}
     \item[$\diamond$ \textbf{R3作为PC的镜像}] 在中断允许标志位EN\_INT为1时，R3和PC保持同步变化。
         在取指令的时候，R3随PCINC同步自增。当JMP指令执行的时候，由于IR3\wave IR2已经规定为11，所以DRW
