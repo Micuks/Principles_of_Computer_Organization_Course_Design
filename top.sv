@@ -122,7 +122,8 @@ module cpu (
     if (~clr) begin
       st1 <= 1'b0;
     end else if (~t3) begin
-      if (~st1 & int0 & ((w2 & (bool_func(
+      if (int0 & // accepted interrupt
+          ~st1 & ((w2 & (bool_func( // public operation
               union_ir, spc  // spc == nop
           ) | bool_func(
               union_ir, add
@@ -166,7 +167,7 @@ module cpu (
     if (~clr) begin
       en_int <= 1'b1;
     end else if (~t3) begin
-      en_int <= (inten | (en_int & ~intdi));
+      en_int <= (inten | (en_int & ~intdi)); // show if it is not in interruption
     end else begin
       en_int <= en_int;  // unpredicted corner case
     end
@@ -179,10 +180,10 @@ module cpu (
       int0 <= 1'b0;
     end
     if (pulse) begin
-      int0 <= en_int;
+      int0 <= en_int; // accept interrupt request
     end
     if (!en_int) begin
-      int0 <= 1'b0;
+      int0 <= 1'b0; // finish accept
     end
   end
 
