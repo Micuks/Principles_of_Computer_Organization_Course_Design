@@ -218,7 +218,9 @@ module cpu (
       union_ir, stp
   ) | bool_func(
       union_ir, spc
-  )));
+  ))) | (w3 & bool_func(
+      union_ir, iret
+  ));
 
   assign pcinc = (w1 & (bool_func(
       union_ir, add
@@ -261,10 +263,11 @@ module cpu (
       union_ir, jmp
   ) | bool_func(
       union_ir, dec
-  ))) | (w3 & (bool_func(
-      union_ir, st
   ) | bool_func(
       union_ir, iret
+    
+  ))) | (w3 & (bool_func(
+      union_ir, st
   ))));
 
 
@@ -292,10 +295,10 @@ module cpu (
       union_ir, axor
   ) | bool_func(
       union_ir, dec
-  ))) | (w3 & (bool_func(
-      union_ir, st
   ) | bool_func(
       union_ir, iret
+  ))) | (w3 & (bool_func(
+      union_ir, st
   ))));
 
   assign s[0] = (w2 & (bool_func(
@@ -354,10 +357,11 @@ module cpu (
       union_ir, axor
   ) | bool_func(
       union_ir, dec
-  ))) | (w3 & (bool_func(
-      union_ir, st
   ) | bool_func(
       union_ir, iret
+ 
+  ))) | (w3 & (bool_func(
+      union_ir, st
   ))));
 
   assign drw = (w1 & (bool_func(
@@ -449,10 +453,11 @@ module cpu (
       union_ir, jmp
   ) | bool_func(
       union_ir, axor
-  ))) | (w3 & (bool_func(
-      union_ir, st
   ) | bool_func(
       union_ir, iret
+
+  ))) | (w3 & (bool_func(
+      union_ir, st
   ))));
   //   $display("w2[%1b] m[%1b] union_ir[%4b] b_f(sub)[%1b]", w2, m, union_ir, bool_func(union_ir, sub));
 
@@ -480,9 +485,9 @@ module cpu (
       union_ir, pc
   )) | (w2 & (bool_func(
       union_ir, jmp
-  ) | st1)) | (w3 & bool_func(
+  ) | st1 | bool_func(
       union_ir, iret
-  ));
+  )));
 
   assign stop = (w1 & (bool_func(
       union_ir, wreg1
@@ -564,7 +569,7 @@ module cpu (
       union_ir, wreg2
   ) | bool_func(
       union_ir, rreg
-  ))) | (w3 & (bool_func(
+  ) | bool_func(
       union_ir, iret
   )));
 
@@ -674,7 +679,7 @@ module cpu (
       union_ir, wreg2
   ) | bool_func(
       union_ir, rreg
-  ))) | (w3 & (bool_func(
+  ) | bool_func(
       union_ir, iret
   )));
 
@@ -686,7 +691,7 @@ module cpu (
       union_ir, rreg
   ))) | (w2 & (bool_func(
       union_ir, rreg
-  ))) | (w3 & (bool_func(
+  ) | bool_func(
       union_ir, iret
   )));
 
