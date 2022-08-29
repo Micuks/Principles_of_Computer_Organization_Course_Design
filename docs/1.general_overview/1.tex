@@ -10,8 +10,9 @@
 
 其中各个信号的作用如表所示\ref{tab:output_signal}
 \begin{table}[htbp]
+    \centering
     \label{tab:output_signal}
-    \resizebox{0.9\linewidth}{!}{
+    \resizebox{0.5\linewidth}{!}{
     \begin{tabular}{|l|l|}
     \hline
     信号          & 说明                                                     \\ \hline
@@ -28,7 +29,7 @@
     LAR         & =1时在T3上升沿将数据总线数据写入AR                                   \\ \hline
     PCADD       & =1时在T3上升沿将PC的值加上IR3$\sim$1的值生成新的PC                     \\ \hline
     ARINC       & =1时在T3上升沿AR+1                                          \\ \hline
-    SETCTL      & 见TEC-8结构图，SETCTL控制二选一选择器，\\设置RD0 RD1 RS0 RS1的值由IR还是SEL决定 \\ \hline
+    SETCTL      & \makecell[c] {见TEC-8结构图，SETCTL控制二选一选择器，\\设置RD0 RD1 RS0 RS1的值由IR还是SEL决定} \\ \hline
     MEMW        & =1时T2上升沿将数据总线上数据写入AR指定地址处                              \\ \hline
     STOP        & =1时T3结束后停止输出节拍脉冲信号T1 T2 T3                             \\ \hline
     LIR         & =1是在T3上升沿将PC指定地址处的值写入IR                                \\ \hline
@@ -50,15 +51,17 @@
 
 TEC-8的各个部件之间通过数据通路连接，由各个信号控制各个部件的工作，使部件之间互相配合完成计算工作。
 
+\clearpage
 \subsection{时序信号}
 
-TEC-8模型机中时序发生器产生的时序信号如图所示
+TEC-8模型机中时序发生器产生的时序信号如图\ref{fig:timing}所示
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{figures/chapter1/timing.png}
     \caption{时序信号}
+    \label{fig:timing}
 \end{figure}
 
-其中主时钟MF频率为1MHz,T1、T2、T3为节拍脉冲信号，W1~W3为节拍电位信号。时序信号在设计控制器时起到重要作用，W节拍电位信号可以用于标志指令执行阶段，T3脉冲控制内部状态变化。
+其中主时钟MF频率为1MHz,T1、T2、T3为节拍脉冲信号，W1\~{}W3为节拍电位信号。时序信号在设计控制器时起到重要作用，W节拍电位信号可以用于标志指令执行阶段，T3脉冲控制内部状态变化。
 
