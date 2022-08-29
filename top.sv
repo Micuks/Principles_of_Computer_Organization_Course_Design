@@ -63,6 +63,7 @@ module cpu (
   assign sw = {swc, swb, swa};
 
   assign union_ir = {ir[7:4], sw[2:0], st0, st1};
+  assign ins_fetch = (sw == 3'b000);
 
   // instruction name and ir {ir[7:4], sw[2:0], st0, st1}
   // interrupt instructions
@@ -122,8 +123,8 @@ module cpu (
     if (~clr) begin
       st1 <= 1'b0;
     end else if (~t3) begin
-      if (int0 & // accepted interrupt
-          ~st1 & ((w2 & (bool_func( // public operation
+      if (int0 &  // accepted interrupt
+          ~st1 & ((w2 & (bool_func(  // public operation
               union_ir, spc  // spc == nop
           ) | bool_func(
               union_ir, add
@@ -167,7 +168,7 @@ module cpu (
     if (~clr) begin
       en_int <= 1'b1;
     end else if (~t3) begin
-      en_int <= (inten | (en_int & ~intdi)); // show if it is not in interruption
+      en_int <= (inten | (en_int & ~intdi));  // show if it is not in interruption
     end else begin
       en_int <= en_int;  // unpredicted corner case
     end
@@ -180,10 +181,10 @@ module cpu (
       int0 <= 1'b0;
     end
     if (pulse) begin
-      int0 <= en_int; // accept interrupt request
+      int0 <= en_int;  // accept interrupt request
     end
     if (!en_int) begin
-      int0 <= 1'b0; // finish accept
+      int0 <= 1'b0;  // finish accept
     end
   end
 
@@ -192,61 +193,9 @@ module cpu (
 
   assign inten = bool_func(union_ir, iret) & w2;
 
-  assign lir = (w1 & (bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  )));
+  assign lir = (w1 & st0 & !st1 & ins_fetch);
 
-  assign pcinc = (w1 & (bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  )));
+  assign pcinc = (w1 & st0 & !st1 & ins_fetch);
 
 
   assign s[3] = ((w2 & (bool_func(
@@ -310,33 +259,7 @@ module cpu (
 
   assign cin = (w2 & (bool_func(union_ir, add) | bool_func(union_ir, dec)));
 
-  assign abus = ((w1 & (en_int & (bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  )))) | (w2 & (bool_func(
+  assign abus = ((w1 & (en_int & st0 & !st1 & ins_fetch)) | (w2 & (bool_func(
       union_ir, add
   ) | bool_func(
       union_ir, sub
@@ -366,33 +289,7 @@ module cpu (
       union_ir, wreg2
   ) | bool_func(
       union_ir, pc
-  ) | (en_int & (bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  ))))) | (w2 & ((bool_func(
+  ) | (en_int & st0 & !st1 & ins_fetch))) | (w2 & ((bool_func(
       union_ir, add
   ) | bool_func(
       union_ir, sub
@@ -508,6 +405,8 @@ module cpu (
       union_ir, wreg2
   ) | bool_func(
       union_ir, rreg
+  ) | bool_func(
+      union_ir, iret
   )));
 
   assign mbus = (w1 & bool_func(union_ir, rsto2)) | (w3 & bool_func(union_ir, ld));
@@ -532,33 +431,7 @@ module cpu (
       union_ir, rsto2
   ) | bool_func(
       union_ir, pc
-  ) | (en_int & (bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  ))))) | (w2 & (bool_func(
+  ) | (en_int & st0 & !st1 & ins_fetch))) | (w2 & (bool_func(
       union_ir, wreg1
   ) | bool_func(
       union_ir, wreg2
@@ -602,33 +475,7 @@ module cpu (
       union_ir, wreg2
   ) | bool_func(
       union_ir, pc
-  )) | ((bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  )) & en_int))) | (w2 & (bool_func(
+  )) | (st0 & !st1 & en_int & ins_fetch))) | (w2 & (bool_func(
       union_ir, wreg2
   ) | bool_func(
       union_ir, rreg
@@ -640,33 +487,7 @@ module cpu (
       union_ir, wreg1
   ))) | (w1 & (bool_func(
       union_ir, pc
-  ) | (en_int & (bool_func(
-      union_ir, add
-  ) | bool_func(
-      union_ir, sub
-  ) | bool_func(
-      union_ir, aand
-  ) | bool_func(
-      union_ir, inc
-  ) | bool_func(
-      union_ir, ld
-  ) | bool_func(
-      union_ir, st
-  ) | bool_func(
-      union_ir, jc
-  ) | bool_func(
-      union_ir, jz
-  ) | bool_func(
-      union_ir, jmp
-  ) | bool_func(
-      union_ir, axor
-  ) | bool_func(
-      union_ir, dec
-  ) | bool_func(
-      union_ir, stp
-  ) | bool_func(
-      union_ir, spc
-  )))));
+  ) | (en_int & st0 & !st1 & ins_fetch)));
 
   assign sel1 = (w1 & (bool_func(
       union_ir, wreg1
