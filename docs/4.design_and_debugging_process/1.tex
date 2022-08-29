@@ -1,47 +1,78 @@
-\subsection{实验日志}
-\begin{enumerate}[]
-    \item 2022.8.22
-    \begin{itemize}
-        \item 学习verilog语法、回顾Quartus II的基本操作
-        \item 详细阅读实验指导书和教学PPT，进一步了解课程设计目标
-    \end{itemize}
-    \item 2022.8.23
-    \begin{itemize}
-        \item 讨论硬连线控制器基本功能流程图，划分模块并分配工作
-        \item 制作指令集、流程图、译码表
-        \item 代码编写和仿真测试
-    \end{itemize}
-    \item 2022.8.24
-    \begin{itemize}
-        \item 基本功能现场调试
-    \end{itemize}
-    \item 2022.8.25
-    \begin{itemize}
-        \item 重新制作译码表，修改组合逻辑
-        \item 修改代码结构，进行仿真测试和现场调试
-    \end{itemize}
-    \item 2022.8.26
-    \begin{itemize}
-        \item 讨论流水线实现过程
-        \item 修改流程图和译码表
-        \item 修改组合逻辑，修改代码
-        \item 仿真测试和现场调试
-    \end{itemize}
-    \item 2022.8.27
-    \begin{itemize}
-        \item 讨论中断实现过程
-        \item 修改流程图和译码表
-        \item 修改组合逻辑，修改代码
-        \item 仿真测试和现场调试
-    \end{itemize}
-    \item 2022.8.28
-    \begin{itemize}
-        \item 继续现场调试，寻找程序漏洞
-        \item 实验报告分工，开始撰写实验报告
-    \end{itemize}
-    \item 2022.8.29
-    \begin{itemize}
-        \item 继续现场调试，寻找程序漏洞
-        \item 实验报告分工，开始撰写实验报告
-    \end{itemize}
-\end{enumerate}
+\subsection{测试样例集}
+\subsubsection{测试样例1}
+寄存器R2设为12H，R3设为0FH。
+\begin{table}[h]
+    \centering
+    \begin{tabular}[c]{|c|c|c|}
+        \hline
+        地址  & 指令          & 机器16进制代码       \\
+        \hline
+        00H & LD R0, [R3] & 0101 0011 [53] \\
+        \hline
+        01H & INC R3      & 0100 1100 [4C] \\
+        \hline
+        02H & LD R1, [R3] & 0101 0111 [57] \\
+        \hline
+        03H & SUB R0,R1   & 0010 0001 [21] \\
+        \hline
+        04H & JZ 0BH      & 1000 0110 [86] \\
+        \hline
+        05H & ST R0, [R2] & 0110 1000 [68] \\
+        \hline
+        06H & INC R3      & 0100 1100 [4C] \\
+        \hline
+        07H & LD R0, [R3] & 0101 0011 [53] \\
+        \hline
+        08H & ADD R0,R1   & 0001 0001 [11] \\
+        \hline
+        09H & JC 0CH      & 0111 0010 [72] \\
+        \hline
+        0AH & INC R2      & 0100 1000 [48] \\
+        \hline
+        0BH & ST R2, [R2] & 0110 1010 [6A] \\
+        \hline
+        0CH & AND R0,R1   & 0011 0001 [31] \\
+        \hline
+        0DH & XOR R0,R2   & 1010 0010 [A2] \\
+        \hline
+        OEH & STP         & 1110 0000 [R0] \\
+        \hline
+        0FH & 85H         & 1000 0101 [85] \\
+        \hline
+        10H & 23H         & 0010 0011 [23] \\
+        \hline
+        11H & 0EFH        & 1110 1111 [EF] \\
+        \hline
+        12H & 00H         & 0000 0000 [00] \\
+        \hline
+    \end{tabular}
+\end{table}
+此测试集用于基础和流水线版本硬布线控制器各指令的调试。
+
+\subsubsection{测试样例2}
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}[c]{|c|c|c|}
+        \hline
+        地址  & 指令        & 机器16进制代码      \\
+        \hline
+        51H & INC R0    & 0100 0000 [40] \\
+        \hline
+        52H & INC R0    & 0100 0000 [40] \\
+        \hline
+        53H & INC R0    & 0100 0000 [40] \\
+        \hline
+        54H & INC R0    & 0100 0000 [40] \\
+        \hline
+        55H & INC R0    & 0100 0000 [40] \\
+        \hline
+        56H & JMP [R1]   & 1001 1101 [9D] \\
+        \hline
+        45H & ADD R0,R0 & 0001 0000 [10] \\
+        \hline
+        46H & IRET      & 1111 0000 [F0]  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+此测试集用于在单拍和连续状况下调试中断功能硬布线控制器。
