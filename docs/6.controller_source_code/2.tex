@@ -1,4 +1,4 @@
-\subsection{实现流水线的硬布线控制器}
+\subsection{实现中断功能的硬布线控制器}
 \begin{lstlisting}{language=verilog}
   function bool_func;
 
@@ -218,8 +218,7 @@
         union_ir, dec
     )));
   
-    assign cin = (w1 && (bool_func(union_ir, add) ||
-      bool_func(union_ir, dec)));
+    assign cin = (w1 && (bool_func(union_ir, add) || bool_func(union_ir, dec)));
   
     assign abus = ((w1 && (bool_func(
         union_ir, add
@@ -290,8 +289,8 @@
     ) || bool_func(
         union_ir, dec
     )));
-    $display("w2[%1b] ldc[%1b] union_ir[%4b] b_f(sub)[%1b]",
-      w2, ldc, union_ir, bool_func(union_ir, sub));
+    //   $display("w2[%1b] ldc[%1b] union_ir[%4b] b_f(sub)[%1b]",
+    //     w2, ldc, union_ir, bool_func(union_ir, sub));
   
     assign m = ((w1 && (bool_func(
         union_ir, aand
@@ -306,8 +305,8 @@
     ))) || (w2 && (bool_func(
         union_ir, st
     ))));
-    $display("w2[%1b] m[%1b] union_ir[%4b] b_f(sub)[%1b]",
-      w2, m, union_ir, bool_func(union_ir, sub));
+    //   $display("w2[%1b] m[%1b] union_ir[%4b] b_f(sub)[%1b]",
+    //     w2, m, union_ir, bool_func(union_ir, sub));
   
     assign lar = (w1 && (bool_func(
         union_ir, wsto1
@@ -324,8 +323,7 @@
     assign pcadd = w1 && ((bool_func(union_ir, jc) && c) ||
       (bool_func(union_ir, jz) && z));
   
-    assign lpc = w1 && (bool_func(union_ir, pc) ||
-      bool_func(union_ir, jmp));
+    assign lpc = w1 && (bool_func(union_ir, pc) || bool_func(union_ir, jmp));
   
     assign stop = (w1 && (bool_func(
         union_ir, wreg1
@@ -473,5 +471,4 @@
         union_ir, wreg1
     ));
   endmodule
-  
 \end{lstlisting}
