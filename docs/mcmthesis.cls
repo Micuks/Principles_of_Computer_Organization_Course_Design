@@ -191,7 +191,7 @@
 %     \@keywords\par
 %   }
 % \fi
-\newcommand{\headset}{{陈宇\;吴清柳\;谢卫凯\;高小晗}\\~\\计算机组成原理课程设计}
+\newcommand{\headset}{{计算机组成原理课程设计\\~\\陈宇\;吴清柳\;谢卫凯\;高小晗}}
 \newcommand{\problem}[1]{\mcmsetup{problem = #1}}
 \def\makesheet{%
   \pagestyle{empty}%
@@ -247,6 +247,7 @@
     % \make@keywords
   \fi%
 }
+
 \def\MCM@memoto{\relax}
 \newcommand{\memoto}[1]{\gdef\MCM@memoto{#1}}
 \def\MCM@memofrom{\relax}
