@@ -175,23 +175,23 @@
       \end{minipage}}
       {\egroup\smallskip}
 
-\def\keywordsname{Keywords}
-\ifMCM@opt@CTeX
-  \newbox\@keywords
-  \setbox\@keywords\hbox{}
-  \def\keywords{\global\setbox\@keywords\vbox\bgroup\noindent\leftskip0cm}
-  \def\endkeywords{\egroup}%
-  \def\make@keywords{%
-   \par\hskip.4cm\textbf{\keywordsname}: \usebox\@keywords\hfill\par
-  }
-\else
-  \NewEnviron{keywords}{\xdef\@keywords{\expandonce\BODY}}
-  \def\make@keywords{%
-    \par\noindent\textbf{\keywordsname}:
-    \@keywords\par
-  }
-\fi
-\newcommand{\headset}{{\the\year}\\计算机组成原理课程设计\\课程设计报告}
+% \def\keywordsname{Keywords}
+% \ifMCM@opt@CTeX
+%   \newbox\@keywords
+%   \setbox\@keywords\hbox{}
+%   \def\keywords{\global\setbox\@keywords\vbox\bgroup\noindent\leftskip0cm}
+%   \def\endkeywords{\egroup}%
+%   \def\make@keywords{%
+%    \par\hskip.4cm\textbf{\keywordsname}: \usebox\@keywords\hfill\par
+%   }
+% \else
+%   \NewEnviron{keywords}{\xdef\@keywords{\expandonce\BODY}}
+%   \def\make@keywords{%
+%     \par\noindent\textbf{\keywordsname}:
+%     \@keywords\par
+%   }
+% \fi
+\newcommand{\headset}{{陈宇\;吴清柳\;谢卫凯\;高小晗}\\~\\计算机组成原理课程设计}
 \newcommand{\problem}[1]{\mcmsetup{problem = #1}}
 \def\makesheet{%
   \pagestyle{empty}%
@@ -223,7 +223,7 @@
   \end{center}
 \ifMCM@opt@keywordsinsheet
   \make@abstract
-  \make@keywords
+  % \make@keywords
 \else
   \make@abstract
 \fi}
@@ -244,7 +244,7 @@
   \vskip 1.5em%
   \ifMCM@opt@abstract%
     \make@abstract
-    \make@keywords
+    % \make@keywords
   \fi%
 }
 \def\MCM@memoto{\relax}

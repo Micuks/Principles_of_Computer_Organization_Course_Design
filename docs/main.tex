@@ -26,22 +26,24 @@
 \newcommand{\comma}{\char`\、}
 \newcommand{\fixedgraphic}[1]{\includegraphics[width=0.9\textwidth]{#1}}
 
-\renewcommand{\abstractname}{\large Summary}
-\title{\LARGE\textbf{中文标题}} %标题
+\renewcommand{\abstractname}{\large 概述}
+\title{\LARGE\textbf{计算机组成原理课程设计报告}} %标题
 \begin{document}
 \begin{abstract}
   \par
-  \begin{itemize}
-    \item \textbf{第一章} 总体概述
-    \item \textbf{第二章} 设计思路
-    \item \textbf{第三章} 详细设计
-    \item \textbf{第四章} 设计与调试过程
-    \item \textbf{第五章} 实验总结与心得
-    \item \textbf{第六章} 控制器源代码
-  \end{itemize}
-  \begin{keywords}
-    keyword 1, keyword 2, etc.
-  \end{keywords}
+  基本内容: 基于TEC-8的数据通路设计一个硬布线控制器，并实现了流水和中断功能。
+  \par
+  实验方法: 本实验依赖于实验室TEC-8实验系统的资源，采用Verilog HDL进行开发。
+  \par
+  团队分工: 控制器的设计（各模块的功能分析、整体设计）和实现（程序调试、文档编写工作）
+  由四名组员共同完成。我们组四人共同负责框架的设计、代码实现并进行测试，以及以及报告编写工作。
+  \par
+  实验成果: 实现了基本顺序硬布线控制器和流水型硬布线控制器，中断功能硬布线控制器；
+  实现了指定程序运行的起始位置的功能（修改PC指针）和扩展了指令集（DEC、XOR、STP和NOP）；
+  \par
+  % \begin{keywords}
+  %   keyword 1, keyword 2, etc.
+  % \end{keywords}
 \end{abstract}
 \maketitle
 \tableofcontents
