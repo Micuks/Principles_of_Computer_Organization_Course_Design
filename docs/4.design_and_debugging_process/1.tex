@@ -3,6 +3,7 @@
 寄存器R2设为12H，R3设为0FH。
 \begin{table}[h]
     \centering
+    \resizebox{0.4\textwidth}{!}{
     \begin{tabular}[c]{|c|c|c|}
         \hline
         地址  & 指令          & 机器16进制代码       \\
@@ -46,12 +47,14 @@
         12H & 00H         & 0000 0000 [00] \\
         \hline
     \end{tabular}
+    }
 \end{table}
 此测试集用于基础和流水线版本硬布线控制器各指令的调试。
 
 \subsubsection{测试样例2}
 \begin{table}[htbp]
     \centering
+    \resizebox{0.4\textwidth}{!}{
     \begin{tabular}[c]{|c|c|c|}
         \hline
         地址  & 指令        & 机器16进制代码      \\
@@ -73,6 +76,7 @@
         46H & IRET      & 1111 0000 [F0]  \\
         \hline
     \end{tabular}
+    }
 \end{table}
 
 此测试集用于在单拍和连续状况下调试中断功能硬布线控制器。
